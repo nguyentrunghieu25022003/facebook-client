@@ -1,8 +1,12 @@
-# React + Vite
+# FACEBOOK
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Overview
 
-Currently, two official plugins are available:
+The Facebook Clone Frontend project is a web-based application built to replicate the essential features of Facebook's user interface and functionalities. Developed using modern frontend technologies, this project enables users to interact in a social media environment by posting content, adding friends, commenting, liking, and sending messages. With a focus on a responsive and intuitive UI, this clone aims to deliver a familiar and engaging user experience.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Screenshots
+
+![alt text](image-3.png)
+![alt text](image.png)
+![alt text](image-1.png)
+![alt text](image-2.png)

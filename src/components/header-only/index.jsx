@@ -45,64 +45,61 @@ const Header = () => {
   const allFriends = friendsState.items?.ReceivedFriends?.concat(friendsState.items?.RequestedFriends) || [];
   const socket = useSocket();
 
-  useEffect(() => {
-    const fetchMessages = async () => {
-      if (user && user?.UserID) {
-        try {
-          const response = await fetchLastMessage(user?.UserID);
-          console.log(response);
-          setCountMessages(response?.length);
-        } catch (error) {
-          console.error("Error fetching messages:", error);
-        }
-      } else {
-        console.error("User or User ID not found.");
+  const fetchMessages = async () => {
+    if (user && user?.UserID) {
+      try {
+        const response = await fetchLastMessage(user?.UserID);
+        const sendersSet = new Set();
+        response.forEach((message) => {
+          sendersSet.add(message.SenderID);
+        });
+        console.log(sendersSet.size)
+        setCountMessages(sendersSet.size);
+      } catch (error) {
+        console.error("Error fetching messages:", error);
       }
-    };
-  
+    } else {
+      console.error("User or User ID not found.");
+    }
+  };
+
+  useEffect(() => {
     fetchMessages();
 
-    if(socket) {
+    if (socket) {
       socket.on("newMessage", () => {
         fetchMessages();
       });
-  
+
       socket.on("messageRead", () => {
         fetchMessages();
       });
 
-      socket.on("like", () => {
-        (async () => {
-          const response = await fetchAllNotification(user.UserID);
-          setNotifications(response.notifications);
-          setCountNotifications(response.countNotifications);
-        })();
+      socket.on("like", async () => {
+        const response = await fetchAllNotification(user.UserID);
+        setNotifications(response.notifications);
+        setCountNotifications(response.countNotifications);
       });
 
-      socket.on("addedPost", () => {
-        (async () => {
-          const response = await fetchAllNotification(user.UserID);
-          setNotifications(response.notifications);
-          setCountNotifications(response.countNotifications);
-        })();
+      socket.on("addedPost", async () => {
+        const response = await fetchAllNotification(user.UserID);
+        setNotifications(response.notifications);
+        setCountNotifications(response.countNotifications);
       });
 
-      socket.on("statusPost", () => {
-        (async () => {
-          const response = await fetchAllNotification(user.UserID);
-          setNotifications(response.notifications);
-          setCountNotifications(response.countNotifications);
-        })();
+      socket.on("statusPost", async () => {
+        const response = await fetchAllNotification(user.UserID);
+        setNotifications(response.notifications);
+        setCountNotifications(response.countNotifications);
       });
 
-      socket.on("commentedPost", () => {
-        (async () => {
-          const response = await fetchAllNotification(user.UserID);
-          setNotifications(response.notifications);
-          setCountNotifications(response.countNotifications);
-        })();
+      socket.on("commentedPost", async () => {
+        const response = await fetchAllNotification(user.UserID);
+        setNotifications(response.notifications);
+        setCountNotifications(response.countNotifications);
       });
     }
+
     return () => {
       socket.off("newMessage");
       socket.off("messageRead");
@@ -110,9 +107,9 @@ const Header = () => {
       socket.off("addedPost");
       socket.off("statusPost");
       socket.off("commentedPost");
-    }
+    };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [socket, user?.UserID, dispatch])
+  }, [socket, user?.UserID]);
 
   const handleLogout = async (event) => {
     event.preventDefault();
@@ -172,42 +169,32 @@ const Header = () => {
         <div className="row">
           <div className="col-xl-12 col-md-12 col-sm-12 col-12">
             <div className="d-flex align-items-center justify-content-between">
-              <div
-                className="d-flex align-items-center gap-2"
-                id={cx("header-left")}
-              >
+              <div className="d-flex align-items-center gap-2" id={cx("header-left")}>
                 <Link to="/">
-                    <FacebookOutlinedIcon className={cx("icon")} />
+                  <FacebookOutlinedIcon className={cx("icon")} />
                 </Link>
                 <Tippy
                   interactive={true}
                   arrow={false}
                   trigger="click"
                   placement="bottom"
-                  content={(
+                  content={
                     <div>
                       <strong className="text-dark fs-4 fw-medium">There are currently no recent searches</strong>
                       <div></div>
                     </div>
-                  )}
+                  }
                   className={cx("custom")}
                 >
                   <form className="d-flex align-items-center">
                     <button className="btn" type="submit">
                       <SearchIcon className={cx("icon")} />
                     </button>
-                    <input
-                      type="search"
-                      className="fs-4"
-                      placeholder="Search on facebook"
-                    />
+                    <input type="search" className="fs-4" placeholder="Search on facebook" />
                   </form>
                 </Tippy>
               </div>
-              <div
-                className="d-flex align-items-center gap-5"
-                id={cx("header-center")}
-              >
+              <div className="d-flex align-items-center gap-5" id={cx("header-center")}>
                 <div className={cx("navigation-item")}>
                   <Link to="/" onClick={() => setIsActive("home")} className={isActive === "home" ? cx("active") : "" }>
                     <HomeIcon className={cx("icon")} />
@@ -234,17 +221,8 @@ const Header = () => {
                   </Link>
                 </div>
               </div>
-              <div
-                className="d-flex align-items-center gap-3"
-                id={cx("header-right")}
-              >
-                <Tippy
-                  interactive={true}
-                  placement="bottom"
-                  arrow={false}
-                  trigger="click"
-                  content={<div>Menu</div>}
-                >
+              <div className="d-flex align-items-center gap-3" id={cx("header-right")}>
+                <Tippy interactive={true} placement="bottom" arrow={false} trigger="click" content={<div>Menu</div>}>
                   <div className={cx("circle")}>
                     <AppsRoundedIcon className={cx("icon")} />
                   </div>
@@ -271,21 +249,15 @@ const Header = () => {
                         </form>
                       </div>
                       <div className={cx("message-list")}>
-                        {allFriends.map((friend, index) => {
-                          return (
-                            <div key={index} className="d-flex align-items-center gap-3 pt-3 pb-3" onClick={() => openChatBox(friend)}>
-                              <img
-                                src={friend?.ProfilePictureURL === "default" ? "/imgs/avatar-trang-4.jpg" : `${import.meta.env.VITE_IMG_URL}${friend?.ProfilePictureURL}`}
-                                alt="avatar"
-                                className={cx("avatar")}
-                              />
-                              <div>
-                                <h6 className="fs-4 fw-medium text-dark">{friend?.Username}</h6>
-                                <ChatBubble friend={friend} />
-                              </div>
+                        {allFriends.map((friend, index) => (
+                          <div key={index} className="d-flex align-items-center gap-3 pt-3 pb-3" onClick={() => openChatBox(friend)}>
+                            <img src={friend?.ProfilePictureURL === "default" ? "/imgs/avatar-trang-4.jpg" : `${import.meta.env.VITE_IMG_URL}${friend?.ProfilePictureURL}`} alt="avatar" className={cx("avatar")} />
+                            <div>
+                              <h6 className="fs-4 fw-medium text-dark">{friend?.Username}</h6>
+                              <ChatBubble friend={friend} />
                             </div>
-                          );
-                        })}
+                          </div>
+                        ))}
                       </div>
                       <div className={cx("border")}></div>
                       <Link className="fs-4 fw-medium d-block text-center text-decoration-none">See it all in Messenger</Link>
@@ -313,24 +285,18 @@ const Header = () => {
                         </Tippy>
                       </div>
                       <div className={cx("notifications")}>
-                        {notifications.map((notification, index) => {
-                          return (
-                            <div key={index} className="d-flex align-items-center justify-content-between gap-3">
-                              <div className="d-flex align-items-center gap-3">
-                                <img 
-                                  src={notification?.User?.ProfilePictureURL === "default" ? "/imgs/avatar-trang-4.jpg" : `${import.meta.env.VITE_IMG_URL}${notification?.User?.ProfilePictureURL}`} 
-                                  alt="avatar"
-                                  className={cx("avatar")}
-                                />
-                                <div>
-                                  <p className="fs-4 fw-normal text-dark">{notification?.Message}</p>
-                                  <b className="fs-4 fw-medium text-dark">{formatDate(notification?.CreatedAt)}</b>
-                                </div>
+                        {notifications.map((notification, index) => (
+                          <div key={index} className="d-flex align-items-center justify-content-between gap-3">
+                            <div className="d-flex align-items-center gap-3">
+                              <img src={notification?.User?.ProfilePictureURL === "default" ? "/imgs/avatar-trang-4.jpg" : `${import.meta.env.VITE_IMG_URL}${notification?.User?.ProfilePictureURL}`} alt="avatar" className={cx("avatar")} />
+                              <div>
+                                <p className="fs-4 fw-normal text-dark">{notification?.Message}</p>
+                                <b className="fs-4 fw-medium text-dark">{formatDate(notification?.CreatedAt)}</b>
                               </div>
-                              <div className={cx("notification-circle")}></div>
                             </div>
-                          );
-                        })}
+                            <div className={cx("notification-circle")}></div>
+                          </div>
+                        ))}
                       </div>
                     </div>
                   }
@@ -346,14 +312,10 @@ const Header = () => {
                   placement="bottom"
                   arrow={false}
                   trigger="click"
-                  content={(
+                  content={
                     <div className={cx("account-setting")}>
                       <Link to={`/profile/${user?.UserID}/${user?.Username?.toLowerCase().split(" ").join("-")}`} className={cx("user-link")}>
-                        <img
-                          src={user?.ProfilePictureURL === "default" ? "/imgs/avatar-trang-4.jpg" : `${import.meta.env.VITE_IMG_URL}${user?.ProfilePictureURL}`}
-                          alt="avatar"
-                          className={cx("avatar")}
-                        />
+                        <img src={user?.ProfilePictureURL === "default" ? "/imgs/avatar-trang-4.jpg" : `${import.meta.env.VITE_IMG_URL}${user?.ProfilePictureURL}`} alt="avatar" className={cx("avatar")} />
                         <b className="text-dark fs-4 fw-bold">{user?.Username}</b>
                       </Link>
                       <div className={cx("border")}></div>
@@ -391,14 +353,10 @@ const Header = () => {
                         <li className="fs-5 fw-normal text-secondary">Meta © 2024</li>
                       </ul>
                     </div>
-                  )}
+                  }
                   className={cx("custom")}
                 >
-                  <img
-                    src={user?.ProfilePictureURL === "default" ? "/imgs/avatar-trang-4.jpg" : `${import.meta.env.VITE_IMG_URL}${user?.ProfilePictureURL}`}
-                    alt="avatar"
-                    className={cx("avatar")}
-                  />
+                  <img src={user?.ProfilePictureURL === "default" ? "/imgs/avatar-trang-4.jpg" : `${import.meta.env.VITE_IMG_URL}${user?.ProfilePictureURL}`} alt="avatar" className={cx("avatar")} />
                 </Tippy>
               </div>
             </div>
@@ -407,15 +365,9 @@ const Header = () => {
         <div className="row">
           <div className="col-xl-12">
             <div className={cx("chat-list")}>
-              {selectedFriends.map((friend) => {
-                return (
-                  <ChatBox
-                    key={friend.UserID}
-                    friend={friend}
-                    closeChatBox={closeChatBox}
-                  />
-                );
-              })}
+              {selectedFriends.map((friend) => (
+                <ChatBox key={friend.UserID} friend={friend} closeChatBox={closeChatBox} />
+              ))}
             </div>
           </div>
         </div>

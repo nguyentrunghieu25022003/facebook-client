@@ -20,7 +20,7 @@ export const SocketProvider = ({ children }) => {
       });
 
       socketInstance.on("connect", () => {
-        console.log("Connected to socket server!");
+        console.log(`User ${callerUserId} is connected to socket server!`);
         socketInstance.emit("joinRoom", { callerUserId });
       });
 
