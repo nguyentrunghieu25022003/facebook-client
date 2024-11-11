@@ -30,49 +30,31 @@ import ChatBubble from "../chat-bubble/index";
 import ChatBox from "../chat/index.jsx";
 import { useSocket } from "../../utils/socket";
 import { formatDate } from "../../utils/date";
+import useFetchMessages from "../../utils/getLastMessages.jsx";
 
 const cx = classNames.bind(styles);
 
 const Header = () => {
   const dispatch = useDispatch();
   const user = JSON.parse(localStorage.getItem("user"));
+  const { setIsRefreshing, countMessages, fetchMessages } = useFetchMessages(user, fetchLastMessage);
   const [isActive, setIsActive] = useState(JSON.parse(localStorage.getItem("isActive")));
   const [selectedFriends, setSelectedFriends] = useState([]);
   const [notifications, setNotifications] = useState([]);
-  const [countMessages, setCountMessages] = useState(0);
   const [countNotifications, setCountNotifications] = useState(0);
   const friendsState = useSelector((state) => state.friends);
   const allFriends = friendsState.items?.ReceivedFriends?.concat(friendsState.items?.RequestedFriends) || [];
   const socket = useSocket();
-
-  const fetchMessages = async () => {
-    if (user && user?.UserID) {
-      try {
-        const response = await fetchLastMessage(user?.UserID);
-        const sendersSet = new Set();
-        response.forEach((message) => {
-          sendersSet.add(message.SenderID);
-        });
-        console.log(sendersSet.size)
-        setCountMessages(sendersSet.size);
-      } catch (error) {
-        console.error("Error fetching messages:", error);
-      }
-    } else {
-      console.error("User or User ID not found.");
-    }
-  };
-
+  
   useEffect(() => {
     fetchMessages();
 
     if (socket) {
-      socket.on("newMessage", () => {
-        fetchMessages();
-      });
-
-      socket.on("messageRead", () => {
-        fetchMessages();
+      socket.on("countMessages", (message) => {
+        if (message) {
+          setIsRefreshing(true);
+        }
+        console.log("countMessages")
       });
 
       socket.on("like", async () => {
@@ -101,8 +83,7 @@ const Header = () => {
     }
 
     return () => {
-      socket.off("newMessage");
-      socket.off("messageRead");
+      socket.off("countMessages");
       socket.off("like");
       socket.off("addedPost");
       socket.off("statusPost");

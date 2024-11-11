@@ -19,9 +19,10 @@ import { useSocket } from "../../utils/socket";
 import MediaRecorder from "../../components/media-recorder/index";
 import { formatDate, formatTime, shouldDisplayTime } from "../../utils/date";
 import { useSelector, useDispatch } from "react-redux";
-import { fetchAllMessages } from "../../api/index";
+import { fetchAllMessages, fetchLastMessage } from "../../api/index";
 import { Link } from "react-router-dom";
 import { addMessage, readMessage } from "../../redux/slices/messages";
+import useFetchMessages from "../../utils/getLastMessages.jsx";
 
 const cx = classNames.bind(styles);
 
@@ -43,13 +44,21 @@ const ChatBox = ({ friend, closeChatBox }) => {
   const [otherUserIsTyping, setOtherUserIsTyping] = useState(0);
   const typingTimeoutRef = useRef(null);
   const messagesEndRef = useRef(null);
+  const { fetchMessages } = useFetchMessages(user, fetchLastMessage);
   
   useEffect(() => {
     if (socket) {
+      socket.off("newMessage");
+      socket.off("typing");
+      socket.off("messageRead");
+
       socket.on("newMessage", (message) => {
         if (message.ReceiverID === friend.UserID || message.SenderID === friend.UserID) {
           dispatch(addMessage(message));
         }
+        setTimeout(() => {
+          fetchMessages();
+        }, 2000);
       });
 
       socket.on("typing", (data) => {
@@ -64,6 +73,9 @@ const ChatBox = ({ friend, closeChatBox }) => {
       
       socket.on("messageRead", (data) => {
         dispatch(readMessage({ SenderID: data.senderId, ReceiverID: data.receiverId }));
+        setTimeout(() => {
+          fetchMessages();
+        }, 2000);
       });
 
       return () => {
@@ -72,6 +84,7 @@ const ChatBox = ({ friend, closeChatBox }) => {
         socket.off("messageRead");
       };
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [socket, friend.UserID, UserID, dispatch]);
 
   const sendMessage = (message) => {

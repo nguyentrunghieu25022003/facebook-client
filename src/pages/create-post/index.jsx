@@ -53,7 +53,14 @@ const CreatePost = ({ closeModal, setRefreshTrigger }) => {
     const formData = new FormData();
     formData.append("UserID", user.UserID);
     formData.append("Content", postContent);
-    formData.append("PostType", file ? "image" : "text");
+    const fileType = file.type;
+    if (fileType.startsWith("image/")) {
+      formData.append("PostType", "image");
+    } else if (fileType.startsWith("video/")) {
+      formData.append("PostType", "video");
+    } else {
+      formData.append("PostType", "text");
+    }
     if (file) {
       formData.append("FileURL", file);
     }

@@ -1,6 +1,8 @@
 import PropTypes from "prop-types";
 import { createContext, useContext, useEffect, useState } from "react";
 import io from "socket.io-client";
+import useFetchMessages from "./getLastMessages";
+import { fetchLastMessage } from "../api/index";
 
 const SocketContext = createContext();
 
@@ -11,7 +13,9 @@ export const useSocket = () => {
 
 export const SocketProvider = ({ children }) => {
   const [socket, setSocket] = useState(null);
-  const callerUserId = JSON.parse(localStorage.getItem("user"))?.UserID;
+  const user = JSON.parse(localStorage.getItem("user"));
+  const callerUserId = user?.UserID;
+  const { fetchMessages } = useFetchMessages(user, fetchLastMessage);
 
   useEffect(() => {
     if (callerUserId) {
@@ -34,7 +38,7 @@ export const SocketProvider = ({ children }) => {
         socketInstance.disconnect();
       };
     }
-  }, [callerUserId]);
+  }, [callerUserId, fetchMessages]);
 
   if (!socket) {
     console.log("Socket not available yet, waiting for connection...");

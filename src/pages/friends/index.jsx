@@ -46,6 +46,7 @@ const Friends = () => {
               </div>
             );
           })}
+          {friends.length === 0 && <strong className="fs-3 fw-normal">No friends</strong>}
         </div>
       </div>
     </div>

@@ -5,7 +5,6 @@ const messagesSlice = createSlice({
   name: "messages",
   initialState: {
     chatBoxer: {},
-    unreadSenders: {},
     loading: false,
     error: null,
   },

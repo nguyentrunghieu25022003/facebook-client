@@ -43,12 +43,23 @@ export const fetchAllMyPost = async (userId) => {
   }
 };
 
+export const fetchAllMyVideoPost = async () => {
+  try {
+    const response = await axios.get(
+      `${import.meta.env.VITE_API_URL}/page/videos/all`
+    );
+    if (response.status === 200) {
+      return response.data;
+    }
+    return null;
+  } catch (err) {
+    console.error(err);
+  }
+};
+
 export const fetchAllFriendListSuggested = async (userId) => {
   try {
     const response = await axios.get(
-      `${import.meta.env.VITE_API_URL}/page/friends/suggested/${userId}`
-    );
-    console.log(
       `${import.meta.env.VITE_API_URL}/page/friends/suggested/${userId}`
     );
     if (response.status === 200) {
