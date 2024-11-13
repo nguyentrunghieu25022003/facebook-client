@@ -6,6 +6,10 @@ const useFetchMessages = (user, fetchLastMessage) => {
 
   const fetchMessages = useCallback(async () => {
     try {
+      if (!user?.UserID) {
+        console.warn("UserID is undefined, skipping fetchMessages.");
+        return;
+      }
       const response = await fetchLastMessage(user?.UserID);
       const sendersSet = new Set();
       response?.forEach((message) => {
