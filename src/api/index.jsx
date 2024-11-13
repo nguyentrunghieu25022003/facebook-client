@@ -85,6 +85,22 @@ export const fetchLastMessage = async (userId) => {
   }
 };
 
+export const fetchPostDetail = async (postId) => {
+  try {
+    const response = await axios.get(
+      `${import.meta.env.VITE_API_URL}/page/post/detail/${postId}`, { 
+        withCredentials: true
+      }
+    );
+    if (response.status === 200) {
+      return response.data;
+    }
+    return null;
+  } catch (err) {
+    console.error(err);
+  }
+};
+
 export const fetchAllPosts = createAsyncThunk(
   "posts/fetchPosts",
   async (userId, { rejectedWithValue }) => {
@@ -134,3 +150,4 @@ export const fetchAllMessages = createAsyncThunk(
     }
   }
 );
+

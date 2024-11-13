@@ -245,6 +245,14 @@ const PostItem = ({ post, isSelected, setRefreshTrigger, handleSelectPost, user 
     }
   };
 
+  const handleNavigation = () => {
+    const currentPath = window.location.pathname;
+    const targetPath = `/post/detail/${post.PostID}`;
+    if (currentPath !== targetPath) {
+      navigate(targetPath);
+    }
+  };
+
   useEffect(() => {
     if (post) {
       setLikes(post.Likes || []);
@@ -329,7 +337,7 @@ const PostItem = ({ post, isSelected, setRefreshTrigger, handleSelectPost, user 
           <source src={`${import.meta.env.VITE_IMG_URL}${post.VideoURL}`} type="video/mp4" />
         </video>
       )}
-      <div className="d-flex justify-content-between mt-5">
+      <div className="d-flex justify-content-between mt-5" onClick={handleNavigation}>
         <div className="d-flex align-items-center gap-2">
           {likes.length > 0 && (
             <>

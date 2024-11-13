@@ -1,5 +1,5 @@
 import { useParams } from "react-router-dom";
-import RoomPage from "../../utils/room";
+import RoomPage from "../room-page/room-page";
 
 const VideoCall = () => {
   const { userId } = useParams();

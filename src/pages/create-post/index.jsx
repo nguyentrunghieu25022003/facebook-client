@@ -2,7 +2,7 @@ import PropTypes from "prop-types";
 import classNames from "classnames/bind";
 import styles from "./create-post.module.scss";
 import CloseIcon from "@mui/icons-material/Close";
-import CameraAltIcon from "@mui/icons-material/CameraAlt";
+import AttachFileIcon from "@mui/icons-material/AttachFile";
 import EmojiEmotionsIcon from "@mui/icons-material/EmojiEmotions";
 import data from "@emoji-mart/data";
 import Picker from "@emoji-mart/react";
@@ -53,10 +53,10 @@ const CreatePost = ({ closeModal, setRefreshTrigger }) => {
     const formData = new FormData();
     formData.append("UserID", user.UserID);
     formData.append("Content", postContent);
-    const fileType = file.type;
-    if (fileType.startsWith("image/")) {
+    const fileType = file?.type;
+    if (fileType?.startsWith("image/")) {
       formData.append("PostType", "image");
-    } else if (fileType.startsWith("video/")) {
+    } else if (fileType?.startsWith("video/")) {
       formData.append("PostType", "video");
     } else {
       formData.append("PostType", "text");
@@ -134,7 +134,7 @@ const CreatePost = ({ closeModal, setRefreshTrigger }) => {
                         accept="image/*,video/*"
                       />
                       <label htmlFor="file-upload" style={{ cursor: "pointer" }}>
-                        <CameraAltIcon className="fs-2" />
+                        <AttachFileIcon className="fs-2" />
                       </label>
                     </div>
                   </div>

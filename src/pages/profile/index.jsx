@@ -206,7 +206,7 @@ const Profile = () => {
               <p className="fs-4 pt-2 pb-2">
                 {user.Bio === "default" ? "This is my bio" : user.Bio}
               </p>
-              <button className="btn btn-light w-100 fs-4 fw-bold mt-2">Edit my bio</button>
+              {isCurrentUser && <button className="btn btn-light w-100 fs-4 fw-bold mt-2">Edit my bio</button>}
               <p className="fs-4 pt-4 pb-2">
                 <CakeIcon className="fs-1 pb-2" />{" "}
                 {formatDate(profile.DateOfBirth)}

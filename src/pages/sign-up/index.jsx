@@ -33,15 +33,12 @@ const SignUp = ({ closeModal }) => {
           dateOfBirth: dateOfBirth,
           gender: selectedOption,
         },
-        {
-          withCredentials: true,
-        }
       );
 
       if (response.status === 200) {
         console.log("Success !");
         setTimeout(() => {
-          window.location.href = "/";
+          window.location.href = "/auth";
         }, 3000);
       }
     } catch (err) {

@@ -24,8 +24,8 @@ export const SocketProvider = ({ children }) => {
       });
 
       socketInstance.on("connect", () => {
-        console.log(`User ${callerUserId} is connected to socket server!`);
         socketInstance.emit("joinRoom", { callerUserId });
+        socketInstance.emit("user:action", { userId: callerUserId, userStatus: "Online" });
       });
 
       socketInstance.on("connect_error", (err) => {
@@ -35,6 +35,7 @@ export const SocketProvider = ({ children }) => {
       setSocket(socketInstance);
 
       return () => {
+        socketInstance.emit("user:action", { userId: callerUserId, userStatus: "Offline" });
         socketInstance.disconnect();
       };
     }

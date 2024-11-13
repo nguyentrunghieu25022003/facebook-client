@@ -51,18 +51,22 @@ const Video = () => {
         <div className="row">
           <div className="col-xl-7">
             <div className="d-flex flex-column gap-3">
-              {posts.map((post, index) => {
-                return (
-                  <PostItem
-                    key={index}
-                    post={post}
-                    setRefreshTrigger={setRefreshTrigger}
-                    isSelected={selectedPostId === post.PostID}
-                    handleSelectPost={handleSelectPost}
-                    user={user}
-                  />
-                );
-              })}
+            {posts ? (
+              posts.map((post, index) => (
+                <PostItem
+                  key={index}
+                  post={post}
+                  setRefreshTrigger={setRefreshTrigger}
+                  isSelected={selectedPostId === post.PostID}
+                  handleSelectPost={handleSelectPost}
+                  user={user}
+                />
+              ))
+            ) : (
+              <div>
+                <img src="/imgs/loading__.gif" alt="loading" />
+              </div>
+            )}
             </div>
           </div>
           <div className="col-xl-5">

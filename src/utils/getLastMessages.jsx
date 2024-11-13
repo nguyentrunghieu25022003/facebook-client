@@ -11,7 +11,6 @@ const useFetchMessages = (user, fetchLastMessage) => {
       response?.forEach((message) => {
         sendersSet.add(message.SenderID);
       });
-      console.log("Fetched messages", sendersSet);
       setCountMessages(sendersSet.size);
     } catch (error) {
       console.error("Error fetching messages:", error);

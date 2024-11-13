@@ -11,7 +11,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import VideocamIcon from "@mui/icons-material/Videocam";
-import ImageIcon from "@mui/icons-material/Image";
+import AttachFileIcon from "@mui/icons-material/AttachFile";
 import EmojiEmotionsIcon from "@mui/icons-material/EmojiEmotions";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import SendIcon from "@mui/icons-material/Send";
@@ -28,6 +28,7 @@ const cx = classNames.bind(styles);
 
 const ChatBox = ({ friend, closeChatBox }) => {
   const dispatch = useDispatch();
+  const [friendStatus, setFriendStatus] = useState("");
   const [isMinimized, setIsMinimized] = useState(true);
   const [messageValue, setMessageValue] = useState("");
   const [isAudioActive, setIsAudioActive] = useState(false);
@@ -78,10 +79,18 @@ const ChatBox = ({ friend, closeChatBox }) => {
         }, 2000);
       });
 
+      socket.on("friend:status", ({ userId, userStatus }) => {
+        console.log("Friend status in ChatBox received:", { userId, userStatus });
+        if (friend.UserID === userId) {
+          setFriendStatus(userStatus);
+        }
+      });
+
       return () => {
         socket.off("newMessage");
         socket.off("typing");
         socket.off("messageRead");
+        socket.off("friend:status");
       };
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -221,7 +230,7 @@ const ChatBox = ({ friend, closeChatBox }) => {
             />
             <div>
               <h6 className="fs-4 fw-bold">{friend.Username}</h6>
-              <b className="fs-5 fw-normal text-secondary">Online</b>
+              <b className="fs-5 fw-normal text-secondary">{friendStatus}</b>
             </div>
             <span onClick={toggleMinimize}>
               {!isMinimized ? (
@@ -387,7 +396,7 @@ const ChatBox = ({ friend, closeChatBox }) => {
               />
               {!isAudioActive && (
                 <span onClick={triggerFileInput}>
-                  <ImageIcon className="fs-1 text-dark" />
+                  <AttachFileIcon className="fs-1 text-dark" />
                   <input
                     type="file"
                     ref={fileInputRef}
