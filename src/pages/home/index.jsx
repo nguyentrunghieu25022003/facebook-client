@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import classNames from "classnames/bind";
 import styles from "./home.module.scss";
 import { fetchAllPosts, fetchAllFriendsList} from "../../api/index";
@@ -79,6 +79,9 @@ const Home = () => {
     dispatch(fetchAllPosts(user?.UserID));
   }, [refreshTrigger, dispatch, user?.UserID]);
 
+  if (!user) {
+    return <Navigate to="/auth" />;
+  }
 
   return (
     <div className={cx("home")}>
