@@ -192,7 +192,7 @@ const Header = () => {
                             <li key={index}>
                               <Link className="text-decoration-none d-flex align-items-center gap-3" to={`/profile/${user?.UserID}/${user?.Username?.toLowerCase().split(" ").join("-")}`}>
                                 <img
-                                  src={user.ProfilePictureURL === "default" ? "/imgs/avatar-trang-4.jpg" : `${import.meta.env.VITE_IMG_URL}${user.ProfilePictureURL}`}
+                                  src={user.ProfilePictureURL === "default" ? "/imgs/avatar-trang-4.jpg" : `${import.meta.env.VITE_IMG_URL}${user?.ProfilePictureURL}`}
                                   alt="avatar"
                                   className={cx("avatar")}
                                 />

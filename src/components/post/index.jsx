@@ -265,7 +265,7 @@ const PostItem = ({ post, isSelected, setRefreshTrigger, handleSelectPost, user 
       <div className={cx("user-post")}>
         <div className={cx("post-left")}>
           <img
-            src={post.User.ProfilePictureURL === "default" ? "/imgs/avatar-trang-4.jpg" : `${import.meta.env.VITE_IMG_URL}${post.User.ProfilePictureURL}`}
+            src={post.User.ProfilePictureURL === "default" ? "/imgs/avatar-trang-4.jpg" : `${import.meta.env.VITE_IMG_URL}${post?.User?.ProfilePictureURL}`}
             alt="avatar"
             className={cx("img")}
           />
@@ -330,11 +330,11 @@ const PostItem = ({ post, isSelected, setRefreshTrigger, handleSelectPost, user 
         <p className="fs-4 pt-4" onDoubleClick={() => setIsEditing(true)}>{post.Content}</p>
       )}
       {post.ImageURL && (
-        <img src={`${import.meta.env.VITE_IMG_URL}${post.ImageURL}`} alt="post" className={cx("post-img")} />
+        <img src={`${import.meta.env.VITE_IMG_URL}${post?.ImageURL}`} alt="post" className={cx("post-img")} />
       )}
       {post.VideoURL && (
         <video controls autoPlay loop className={cx("post-video")}>
-          <source src={`${import.meta.env.VITE_IMG_URL}${post.VideoURL}`} type="video/mp4" />
+          <source src={`${import.meta.env.VITE_IMG_URL}${post?.VideoURL}`} type="video/mp4" />
         </video>
       )}
       <div className="d-flex justify-content-between mt-5" onClick={handleNavigation}>
@@ -427,7 +427,7 @@ const PostItem = ({ post, isSelected, setRefreshTrigger, handleSelectPost, user 
             </Tippy>
             <div className={cx("user-comment")}>
               <img
-                src={user.ProfilePictureURL === "default" ? "/imgs/avatar-trang-4.jpg" : `${import.meta.env.VITE_IMG_URL}${user.ProfilePictureURL}`}
+                src={user.ProfilePictureURL === "default" ? "/imgs/avatar-trang-4.jpg" : `${import.meta.env.VITE_IMG_URL}${user?.ProfilePictureURL}`}
                 alt="avatar"
                 className={cx("user-avatar")}
               />

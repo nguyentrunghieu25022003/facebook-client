@@ -143,7 +143,7 @@ const Profile = () => {
                   <div className="d-flex flex-column">
                     <LazyLoadImage
                       effect="blur"
-                      src={profile.ProfilePictureURL === "default" ? "/imgs/avatar-trang-4.jpg" : `${import.meta.env.VITE_IMG_URL}${profile.ProfilePictureURL}`}
+                      src={profile.ProfilePictureURL === "default" ? "/imgs/avatar-trang-4.jpg" : `${import.meta.env.VITE_IMG_URL}${profile?.ProfilePictureURL}`}
                       alt="avatar"
                     />
                     {isCurrentUser && (
@@ -239,7 +239,7 @@ const Profile = () => {
                       <Link key={index} to={`/profile/${friend.UserID}/${friend.Username}`} className="col-xl-4 text-decoration-none">
                         <LazyLoadImage
                           effect="blur"
-                          src={friend.ProfilePictureURL === "default" ? "/imgs/avatar-trang-4.jpg" : `${import.meta.env.VITE_IMG_URL}${friend.ProfilePictureURL}`}
+                          src={friend.ProfilePictureURL === "default" ? "/imgs/avatar-trang-4.jpg" : `${import.meta.env.VITE_IMG_URL}${friend?.ProfilePictureURL}`}
                           alt="avatar"
                         />
                         <h6 className="fs-5 text-dark fw-bold pt-3">{friend.Username}</h6>
