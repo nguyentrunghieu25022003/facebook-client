@@ -87,10 +87,12 @@ const ChatBox = ({ friend, closeChatBox }) => {
       });
 
       return () => {
-        socket.off("newMessage");
-        socket.off("typing");
-        socket.off("messageRead");
-        socket.off("friend:status");
+        if(socket) {
+          socket.off("newMessage");
+          socket.off("typing");
+          socket.off("messageRead");
+          socket.off("friend:status");
+        }
       };
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps

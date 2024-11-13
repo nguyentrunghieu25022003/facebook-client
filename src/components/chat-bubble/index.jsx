@@ -30,8 +30,10 @@ const ChatBubble = ({ friend }) => {
       socket.on("messageRead", fetchMessages);
 
       return () => {
-        socket.off("newMessage", fetchMessages);
-        socket.off("messageRead", fetchMessages);
+        if(socket) {
+          socket.off("newMessage", fetchMessages);
+          socket.off("messageRead", fetchMessages);
+        }
       };
     }
   }, [socket, fetchMessages]);
