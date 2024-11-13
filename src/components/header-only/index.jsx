@@ -21,7 +21,7 @@ import {
   FullscreenExitIcon,
   EditNoteIcon,
 } from "../../icons/header.jsx";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
 import { useEffect, useState } from "react";
@@ -165,6 +165,10 @@ const Header = () => {
   useEffect(() => {
     localStorage.setItem("isActive", JSON.stringify(isActive));
   }, [isActive]);
+
+  if (!user) {
+    return <Navigate to="/auth" />;
+  }
 
   return (
     <header className={cx("header")}>
