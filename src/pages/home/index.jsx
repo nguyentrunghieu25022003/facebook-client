@@ -75,9 +75,9 @@ const Home = () => {
   };
 
   useEffect(() => {
-    dispatch(fetchAllFriendsList(user.UserID));
-    dispatch(fetchAllPosts(user.UserID));
-  }, [refreshTrigger, dispatch, user.UserID]);
+    dispatch(fetchAllFriendsList(user?.UserID));
+    dispatch(fetchAllPosts(user?.UserID));
+  }, [refreshTrigger, dispatch, user?.UserID]);
 
 
   return (

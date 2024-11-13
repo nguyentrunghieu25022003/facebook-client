@@ -37,7 +37,7 @@ const ChatBox = ({ friend, closeChatBox }) => {
   const [isTyping, setIsTyping] = useState(false);
   const fileInputRef = useRef(null);
   const user = JSON.parse(localStorage.getItem("user"));
-  const UserID = user.UserID;
+  const UserID = user?.UserID;
   const key = [UserID, friend.UserID].sort().join("-");
   const messagesState = useSelector((state) => state.messages.chatBoxer[key]);
   const [messages, setMessages] = useState(messagesState);

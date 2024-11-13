@@ -45,7 +45,7 @@ const PostItem = ({ post, isSelected, setRefreshTrigger, handleSelectPost, user 
   const dispatchMyPost = useDispatch();
   const tippyRef = useRef(null);
   const tippyRefBox = useRef(null);
-  const isLikedByCurrentUser = likes.some(like => like.UserID === user.UserID);
+  const isLikedByCurrentUser = likes.some(like => like.UserID === user?.UserID);
   const dateToFormat = new Date(post.UpdatedAt);
   const date = formatDistanceToNow(dateToFormat, {
     addSuffix: true,
@@ -67,7 +67,7 @@ const PostItem = ({ post, isSelected, setRefreshTrigger, handleSelectPost, user 
 
   const handleLikePost = async (e, PostID) => {
     e.preventDefault();
-    const UserID = user.UserID;
+    const UserID = user?.UserID;
     try {
       const response = await axios.post(`${import.meta.env.VITE_API_URL}/page/like`, 
         { UserID, PostID },
@@ -119,7 +119,7 @@ const PostItem = ({ post, isSelected, setRefreshTrigger, handleSelectPost, user 
 
   const handleCommentPost = async (e, PostID) => {
     e.preventDefault();
-    const UserID = user.UserID;
+    const UserID = user?.UserID;
     const Content = commentValue;
     const formData = new FormData();
     formData.append("UserID", UserID);
@@ -234,7 +234,7 @@ const PostItem = ({ post, isSelected, setRefreshTrigger, handleSelectPost, user 
   const handleLikeComment = async (commentId) => {
     try {
       const response = await axios.post(`${import.meta.env.VITE_API_URL}/page/comment/like/${commentId}`, {
-        userId: user.UserID
+        userId: user?.UserID
       });
       if(response.status === 200) {
         console.log("Like comment successfully !");
@@ -273,10 +273,10 @@ const PostItem = ({ post, isSelected, setRefreshTrigger, handleSelectPost, user 
             <b
               className="fs-4 fw-bold pb-2"
               onClick={() =>
-                handleGetProfile(post.User.UserID, post.User.Username)
+                handleGetProfile(post?.User?.UserID, post?.User?.Username)
               }
             >
-              {post.User.Username}
+              {post?.User?.Username}
             </b>
             <div className="d-flex align-items-center gap-2">
               <span>{date}</span>
@@ -296,7 +296,7 @@ const PostItem = ({ post, isSelected, setRefreshTrigger, handleSelectPost, user 
                   <BookmarkIcon className="text-dark fs-2" />
                   <p className="text-dark fs-4 fw-medium">Save</p>
                 </div>
-                {user.UserID === post.User.UserID && <>
+                {user?.UserID === post?.User?.UserID && <>
                   <div className="d-flex align-items-center gap-3 mb-3" onClick={() => handleMyPost("Edit")}>
                     <EditIcon className="text-dark fs-2" />
                     <p className="text-dark fs-4 fw-medium">Edit</p>
