@@ -76,7 +76,6 @@ const Header = () => {
         if (message) {
           setIsRefreshing(true);
         }
-        console.log("countMessages")
       });
 
       socket.on("like", async () => {
@@ -105,7 +104,7 @@ const Header = () => {
     }
 
     return () => {
-      socket.off("countMessages");
+      socket?.off("countMessages");
       socket.off("like");
       socket.off("addedPost");
       socket.off("statusPost");
@@ -159,7 +158,7 @@ const Header = () => {
   }, [user?.UserID]);
 
   useEffect(() => {
-    dispatch(fetchAllFriendsList(user.UserID));
+    dispatch(fetchAllFriendsList(user?.UserID));
   }, [dispatch, user?.UserID]);
 
   useEffect(() => {
@@ -168,7 +167,7 @@ const Header = () => {
 
   if (!user) {
     return <Navigate to="/auth" />;
-  }
+  };
 
   return (
     <header className={cx("header")}>
