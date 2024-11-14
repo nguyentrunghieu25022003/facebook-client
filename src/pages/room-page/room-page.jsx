@@ -3,15 +3,13 @@ import { useEffect, useCallback, useState } from "react";
 import ReactPlayer from "react-player";
 import peer from "../../services/peer";
 import { useSocket } from "../../utils/socket";
-import classNames from "classnames/bind";
-import styles from "./room-page.module.scss";
-
-const cx = classNames.bind(styles);
+import CallIcon from "@mui/icons-material/Call";
 
 const RoomPage = ({ from, to }) => {
   const socket = useSocket();
   const [myStream, setMyStream] = useState();
   const [remoteStream, setRemoteStream] = useState();
+  const [incomingCall, setIncomingCall] = useState(null);
 
   const handleCallUser = useCallback(async () => {
     const stream = await navigator.mediaDevices.getUserMedia({
@@ -26,6 +24,8 @@ const RoomPage = ({ from, to }) => {
 
   const handleIncommingCall = useCallback(
     async ({ fromUserId, offer }) => {
+      playRingtone();
+      setIncomingCall(fromUserId);
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: true,
         video: true,
@@ -34,15 +34,14 @@ const RoomPage = ({ from, to }) => {
 
       const answer = await peer.getAnswer(offer);
       socket.emit("call:accepted", { fromUserId: to, toUserId: from, answer });
+      stopRingtone();
     },
     [socket, to, from]
   );
 
   const sendStreams = useCallback(() => {
     if (myStream) {
-      myStream
-        .getTracks()
-        .forEach((track) => peer.peer.addTrack(track, myStream));
+      myStream.getTracks().forEach((track) => peer.peer.addTrack(track, myStream));
     }
   }, [myStream]);
 
@@ -65,6 +64,18 @@ const RoomPage = ({ from, to }) => {
   const handleNegoNeedFinal = useCallback(async ({ answer }) => {
     await peer.setLocalDescription(answer);
   }, []);
+
+  const playRingtone = () => {
+    const audio = new Audio("/audios/facebook_call.mp3");
+    audio.loop = true;
+    audio.play();
+  };
+
+  const stopRingtone = () => {
+    const audio = new Audio("/audios/facebook_call.mp3");
+    audio.pause();
+    audio.currentTime = 0;
+  };
 
   useEffect(() => {
     peer.peer.addEventListener("track", (event) => {
@@ -98,44 +109,53 @@ const RoomPage = ({ from, to }) => {
   ]);
 
   return (
-    <div className="container">
+    <div className="container bg-white p-5">
       <div className="row">
-        <div className="col-xl-12">
-          <h1 className="mb-4 fs-1 fw-bold">Room</h1>
-          <div className="d-flex align-items-center gap-3">
+        <div className="col-12">
+          <h3 className="text-center mb-4 fs-1 fw-bold">Video Call</h3>
+          <div className="d-flex justify-content-center gap-3 mb-5 mt-2">
             {myStream && (
               <button className="btn btn-primary fs-4" onClick={sendStreams}>
                 Send My Stream
               </button>
             )}
-            {to && (
-              <button className="btn btn-success fs-4" onClick={handleCallUser}>
-                Call {to}
-              </button>
+            {incomingCall ? (
+              <div>
+                <p>Incoming call from {incomingCall}</p>
+                <button onClick={handleCallAccepted}>Accept Call</button>
+              </div>
+            ) : (
+              to && (
+                <button className="btn btn-success fs-4" onClick={handleCallUser}>
+                  <CallIcon className="fs-2" /> Call
+                </button>
+              )
             )}
           </div>
-          <div className={cx("stream-container")}>
+          <div className="d-flex flex-column align-items-center">
             {myStream && (
-              <div className="mt-5">
-                <h2 className="fs-2 fw-medium mb-4">My Stream</h2>
+              <div className="stream-box mb-5 text-center">
+                <h3 className="fs-2 fw-medium mb-4">My Stream</h3>
                 <ReactPlayer
                   playing
                   muted
-                  height="200px"
-                  width="500px"
+                  height="300px"
+                  width="100%"
                   url={myStream}
+                  className="rounded border"
                 />
               </div>
             )}
             {remoteStream && (
-              <div className="mt-5">
-                <h2 className="fs-2 fw-medium mb-4">Remote Stream</h2>
+              <div className="stream-box text-center">
+                <h3 className="fs-2 fw-medium mb-4">Remote Stream</h3>
                 <ReactPlayer
                   playing
                   muted
-                  height="200px"
-                  width="500px"
+                  height="300px"
+                  width="100%"
                   url={remoteStream}
+                  className="rounded border"
                 />
               </div>
             )}
