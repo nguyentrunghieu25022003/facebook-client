@@ -105,10 +105,10 @@ const Header = () => {
 
     return () => {
       socket?.off("countMessages");
-      socket.off("like");
-      socket.off("addedPost");
-      socket.off("statusPost");
-      socket.off("commentedPost");
+      socket?.off("like");
+      socket?.off("addedPost");
+      socket?.off("statusPost");
+      socket?.off("commentedPost");
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [socket, user?.UserID]);
@@ -151,7 +151,7 @@ const Header = () => {
 
   useEffect(() => {
     (async () => {
-      const response = await fetchAllNotification(user.UserID);
+      const response = await fetchAllNotification(user?.UserID);
       setNotifications(response.notifications);
       setCountNotifications(response.countNotifications);
     })();

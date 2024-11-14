@@ -81,7 +81,7 @@ const Home = () => {
 
   if (!user) {
     return <Navigate to="/auth" />;
-  }
+  };
 
   return (
     <div className={cx("home")}>
