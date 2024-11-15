@@ -57,6 +57,7 @@ const RoomPage = () => {
       trickle: false,
       stream: stream,
     });
+    console.log("Call peer", peer);
     peer.on("signal", (data) => {
       console.log("Signal", data);
       socket.emit("callUser", {
@@ -85,6 +86,7 @@ const RoomPage = () => {
       stream: stream,
     });
     peer.on("signal", (data) => {
+      console.log("Signal Answer", data);
       socket.emit("answerCall", { signal: data, to: caller });
     });
     peer.on("stream", (stream) => {
@@ -102,10 +104,10 @@ const RoomPage = () => {
 
   return (
     <>
-      <h3 style={{ textAlign: "center", color: "#fff" }}>Zoomish</h3>
+      <h3 className="fs-2 text-center">Zoomish</h3>
       <div className="container">
         <div className="video-container">
-          <div className="video">
+          <div className="video d-flex justify-content-center">
             {stream && (
               <video
                 playsInline
@@ -127,33 +129,35 @@ const RoomPage = () => {
             ) : null}
           </div>
         </div>
-        <div className="myId">
-          <TextField
-            id="filled-basic"
-            label="Name"
-            variant="filled"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            style={{ marginBottom: "20px" }}
-          />
-          <strong className="fs-4 fw-medium">{me}</strong>
-          <CopyToClipboard text={me} style={{ marginBottom: "2rem" }}>
-            <Button
-              variant="contained"
-              color="primary"
-              startIcon={<AssignmentIcon fontSize="large" />}
-            >
-              Copy ID
-            </Button>
-          </CopyToClipboard>
-
-          <TextField
-            id="filled-basic"
-            label="ID to call"
-            variant="filled"
-            value={idToCall}
-            onChange={(e) => setIdToCall(e.target.value)}
-          />
+        <div className="myId mt-5">
+          <div className="d-flex align-items-center justify-content-center gap-2">
+            <TextField
+              id="filled-basic"
+              label="Name"
+              variant="filled"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
+            <TextField
+              id="filled-basic"
+              label="ID to call"
+              variant="filled"
+              value={idToCall}
+              onChange={(e) => setIdToCall(e.target.value)}
+            />
+          </div>
+          <div className="d-flex align-items-center justify-content-center mt-3">
+            <input className="form-control w-25 fs-4" value={me} disabled />
+            <CopyToClipboard text={me}>
+              <Button
+                variant="contained"
+                color="primary"
+                startIcon={<AssignmentIcon fontSize="large" />}
+              >
+                Copy ID
+              </Button>
+            </CopyToClipboard>
+          </div>
           <div className="call-button">
             {callAccepted && !callEnded ? (
               <Button variant="contained" color="secondary" onClick={leaveCall}>
