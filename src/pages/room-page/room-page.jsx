@@ -147,7 +147,7 @@ const RoomPage = () => {
             />
           </div>
           <div className="d-flex align-items-center justify-content-center mt-3">
-            <input className="form-control w-25 fs-4" value={me} disabled />
+            <input className="form-control fs-4" value={me} disabled />
             <CopyToClipboard text={me}>
               <Button
                 variant="contained"
