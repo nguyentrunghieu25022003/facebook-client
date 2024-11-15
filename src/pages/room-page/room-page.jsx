@@ -140,6 +140,7 @@ const RoomPage = () => {
             onChange={(e) => setName(e.target.value)}
             style={{ marginBottom: "20px" }}
           />
+          <strong className="fs-4 fw-medium">{me}</strong>
           <CopyToClipboard text={me} style={{ marginBottom: "2rem" }}>
             <Button
               variant="contained"
