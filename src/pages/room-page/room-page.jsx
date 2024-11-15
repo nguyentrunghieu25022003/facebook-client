@@ -11,16 +11,19 @@ const RoomPage = ({ from, to }) => {
   const [remoteStream, setRemoteStream] = useState();
   const [incomingCall, setIncomingCall] = useState(null);
 
+  // Tạo một audio object tĩnh cho nhạc chuông
+  const ringtone = new Audio("/audios/facebook_call.mp3");
+  ringtone.loop = true;
+
   const playRingtone = () => {
-    const audio = new Audio("/audios/facebook_call.mp3");
-    audio.loop = true;
-    audio.play();
+    ringtone.play().catch((error) => {
+      console.error("Error playing ringtone:", error);
+    });
   };
 
   const stopRingtone = () => {
-    const audio = new Audio("/audios/facebook_call.mp3");
-    audio.pause();
-    audio.currentTime = 0;
+    ringtone.pause();
+    ringtone.currentTime = 0;
   };
 
   const handleCallUser = useCallback(async () => {
@@ -38,6 +41,7 @@ const RoomPage = ({ from, to }) => {
     async ({ fromUserId, offer }) => {
       playRingtone();
       setIncomingCall(fromUserId);
+      
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: true,
         video: true,
@@ -47,23 +51,30 @@ const RoomPage = ({ from, to }) => {
       const answer = await peer.getAnswer(offer);
       socket.emit("call:accepted", { fromUserId: to, toUserId: from, answer });
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [socket, to, from]
   );
 
   const sendStreams = useCallback(() => {
     if (myStream) {
-      myStream.getTracks().forEach((track) => peer.peer.addTrack(track, myStream));
+      myStream.getTracks().forEach((track) => {
+        if (!peer.peer.getSenders().some(sender => sender.track === track)) {
+          peer.peer.addTrack(track, myStream);
+        }
+      });
     }
   }, [myStream]);
 
-  const handleCallAccepted = useCallback(
-    ({ answer }) => {
+  const handleCallAccepted = useCallback(({ answer }) => {
+    if (answer && answer.type) {
       stopRingtone();
-      peer.setLocalDescription(answer);
+      peer.setLocalDescription(answer).catch(console.error);
       sendStreams();
-    },
-    [sendStreams]
-  );
+    } else {
+      console.error("Invalid answer in handleCallAccepted:", answer);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sendStreams]);
 
   const handleNegoNeedIncomming = useCallback(
     async ({ offer }) => {
@@ -74,7 +85,9 @@ const RoomPage = ({ from, to }) => {
   );
 
   const handleNegoNeedFinal = useCallback(async ({ answer }) => {
-    await peer.setLocalDescription(answer);
+    if (answer) {
+      await peer.setLocalDescription(answer).catch(console.error);
+    }
   }, []);
 
   useEffect(() => {
@@ -120,13 +133,20 @@ const RoomPage = ({ from, to }) => {
               </button>
             )}
             {incomingCall ? (
-              <div>
-                <p>Incoming call from {incomingCall}</p>
-                <button className="btn btn-success fs-4" onClick={handleCallAccepted}>Accept Call</button>
-              </div>
+              <button
+                id="accept-button"
+                className="btn btn-success fs-4"
+                onClick={() => handleCallAccepted({ answer: peer.getLocalDescription() })}
+              >
+                Accept Call
+              </button>
             ) : (
               to && (
-                <button className="btn btn-success fs-4" onClick={handleCallUser}>
+                <button
+                  id="call-button"
+                  className="btn btn-success fs-4"
+                  onClick={handleCallUser}
+                >
                   <CallIcon className="fs-2" /> Call
                 </button>
               )
