@@ -10,7 +10,7 @@ import { useSocket } from "../../utils/socket";
 
 const RoomPage = () => {
   const socket = useSocket();
-  const [me, setMe] = useState("");
+  const me = sessionStorage.getItem("id") || "";
   const [stream, setStream] = useState();
   const [receivingCall, setReceivingCall] = useState(false);
   const [caller, setCaller] = useState("");
@@ -31,11 +31,6 @@ const RoomPage = () => {
       });
 
     if (socket) {
-      socket.on("me", (id) => {
-        console.log("me", id);
-        setMe(id);
-      });
-
       socket.on("callUser", (data) => {
         console.log("Call", data);
         setReceivingCall(true);
@@ -63,6 +58,7 @@ const RoomPage = () => {
       stream: stream,
     });
     peer.on("signal", (data) => {
+      console.log("Signal", data);
       socket.emit("callUser", {
         userToCall: id,
         signalData: data,

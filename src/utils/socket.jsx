@@ -26,6 +26,9 @@ export const SocketProvider = ({ children }) => {
       socketInstance.on("connect", () => {
         socketInstance.emit("joinRoom", { callerUserId });
         socketInstance.emit("user:action", { userId: callerUserId, userStatus: "Online" });
+        socketInstance.on("me", (id) => {
+          sessionStorage.setItem("id", id);
+        });
       });
 
       socketInstance.on("connect_error", (err) => {
