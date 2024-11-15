@@ -10,8 +10,7 @@ const RoomPage = ({ from, to }) => {
   const [myStream, setMyStream] = useState();
   const [remoteStream, setRemoteStream] = useState();
   const [incomingCall, setIncomingCall] = useState(null);
-
-  // Tạo một audio object tĩnh cho nhạc chuông
+  
   const ringtone = new Audio("/audios/facebook_call.mp3");
   ringtone.loop = true;
 
@@ -33,6 +32,8 @@ const RoomPage = ({ from, to }) => {
     });
     setMyStream(stream);
 
+    stream.getTracks().forEach((track) => peer.peer.addTrack(track, stream));
+
     const offer = await peer.getOffer();
     socket.emit("user:call", { fromUserId: from, toUserId: to, offer });
   }, [from, to, socket]);
@@ -41,13 +42,16 @@ const RoomPage = ({ from, to }) => {
     async ({ fromUserId, offer }) => {
       playRingtone();
       setIncomingCall(fromUserId);
-      
+
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: true,
         video: true,
       });
       setMyStream(stream);
 
+      stream.getTracks().forEach((track) => peer.peer.addTrack(track, stream));
+
+      await peer.setRemoteDescription(offer);
       const answer = await peer.getAnswer(offer);
       socket.emit("call:accepted", { fromUserId: to, toUserId: from, answer });
     },
@@ -58,26 +62,30 @@ const RoomPage = ({ from, to }) => {
   const sendStreams = useCallback(() => {
     if (myStream) {
       myStream.getTracks().forEach((track) => {
-        if (!peer.peer.getSenders().some(sender => sender.track === track)) {
+        if (!peer.peer.getSenders().some((sender) => sender.track === track)) {
           peer.peer.addTrack(track, myStream);
         }
       });
     }
   }, [myStream]);
 
-  const handleCallAccepted = useCallback(({ answer }) => {
-    if (answer && answer.type) {
-      stopRingtone();
-      peer.setLocalDescription(answer).catch(console.error);
-      sendStreams();
-    } else {
-      console.error("Invalid answer in handleCallAccepted:", answer);
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sendStreams]);
+  const handleCallAccepted = useCallback(
+    async ({ answer }) => {
+      if (answer && answer.type) {
+        stopRingtone();
+        await peer.setRemoteDescription(answer);
+        sendStreams();
+      } else {
+        console.error("Invalid answer in handleCallAccepted:", answer);
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [sendStreams]
+  );
 
   const handleNegoNeedIncomming = useCallback(
     async ({ offer }) => {
+      await peer.setRemoteDescription(offer);
       const answer = await peer.getAnswer(offer);
       socket.emit("peer:nego:done", { fromUserId: to, toUserId: from, answer });
     },
@@ -86,7 +94,7 @@ const RoomPage = ({ from, to }) => {
 
   const handleNegoNeedFinal = useCallback(async ({ answer }) => {
     if (answer) {
-      await peer.setLocalDescription(answer).catch(console.error);
+      await peer.setRemoteDescription(answer);
     }
   }, []);
 
