@@ -1,4 +1,3 @@
-import PropTypes from "prop-types";
 import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
 import TextField from "@mui/material/TextField";
@@ -29,11 +28,14 @@ const RoomPage = () => {
       .getUserMedia({ video: true, audio: true })
       .then((stream) => {
         setStream(stream);
-        myVideo.current.srcObject = stream;
+        if (myVideo.current) {
+          myVideo.current.srcObject = stream;
+        }
       });
 
     if (socket) {
       socket.on("me", (id) => {
+        console.log("me", id);
         setMe(id);
       });
 
@@ -47,6 +49,10 @@ const RoomPage = () => {
   }, [socket]);
 
   const callUser = (id) => {
+    if (!socket || !me) {
+      console.error("Socket or peer ID not initialized");
+      return;
+    }
     const peer = new Peer({
       initiator: true,
       trickle: false,
@@ -167,7 +173,7 @@ const RoomPage = () => {
         <div>
           {receivingCall && !callAccepted ? (
             <div className="caller">
-              <h1>{name} is calling...</h1>
+              <h3>{name} is calling...</h3>
               <Button variant="contained" color="primary" onClick={answerCall}>
                 Answer
               </Button>
@@ -179,9 +185,4 @@ const RoomPage = () => {
   );
 };
 
-/* RoomPage.propTypes = {
-  from: PropTypes.number.isRequired,
-  to: PropTypes.number.isRequired,
-};
- */
 export default RoomPage;
