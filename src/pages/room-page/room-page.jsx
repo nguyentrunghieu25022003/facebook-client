@@ -28,6 +28,8 @@ const RoomPage = () => {
       .getUserMedia({ video: true, audio: true })
       .then((stream) => {
         setStream(stream);
+        console.log("stream", stream);
+        console.log("my video", myVideo.current)
         if (myVideo.current) {
           myVideo.current.srcObject = stream;
         }
@@ -102,7 +104,7 @@ const RoomPage = () => {
 
   return (
     <>
-      <h1 style={{ textAlign: "center", color: "#fff" }}>Zoomish</h1>
+      <h3 style={{ textAlign: "center", color: "#fff" }}>Zoomish</h3>
       <div className="container">
         <div className="video-container">
           <div className="video">
