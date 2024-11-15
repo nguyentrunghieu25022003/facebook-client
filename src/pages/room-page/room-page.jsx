@@ -11,6 +11,18 @@ const RoomPage = ({ from, to }) => {
   const [remoteStream, setRemoteStream] = useState();
   const [incomingCall, setIncomingCall] = useState(null);
 
+  const playRingtone = () => {
+    const audio = new Audio("/audios/facebook_call.mp3");
+    audio.loop = true;
+    audio.play();
+  };
+
+  const stopRingtone = () => {
+    const audio = new Audio("/audios/facebook_call.mp3");
+    audio.pause();
+    audio.currentTime = 0;
+  };
+
   const handleCallUser = useCallback(async () => {
     const stream = await navigator.mediaDevices.getUserMedia({
       audio: true,
@@ -34,7 +46,6 @@ const RoomPage = ({ from, to }) => {
 
       const answer = await peer.getAnswer(offer);
       socket.emit("call:accepted", { fromUserId: to, toUserId: from, answer });
-      stopRingtone();
     },
     [socket, to, from]
   );
@@ -47,6 +58,7 @@ const RoomPage = ({ from, to }) => {
 
   const handleCallAccepted = useCallback(
     ({ answer }) => {
+      stopRingtone();
       peer.setLocalDescription(answer);
       sendStreams();
     },
@@ -64,18 +76,6 @@ const RoomPage = ({ from, to }) => {
   const handleNegoNeedFinal = useCallback(async ({ answer }) => {
     await peer.setLocalDescription(answer);
   }, []);
-
-  const playRingtone = () => {
-    const audio = new Audio("/audios/facebook_call.mp3");
-    audio.loop = true;
-    audio.play();
-  };
-
-  const stopRingtone = () => {
-    const audio = new Audio("/audios/facebook_call.mp3");
-    audio.pause();
-    audio.currentTime = 0;
-  };
 
   useEffect(() => {
     peer.peer.addEventListener("track", (event) => {
@@ -122,7 +122,7 @@ const RoomPage = ({ from, to }) => {
             {incomingCall ? (
               <div>
                 <p>Incoming call from {incomingCall}</p>
-                <button onClick={handleCallAccepted}>Accept Call</button>
+                <button className="btn btn-success fs-4" onClick={handleCallAccepted}>Accept Call</button>
               </div>
             ) : (
               to && (
