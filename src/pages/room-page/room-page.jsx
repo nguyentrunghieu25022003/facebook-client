@@ -136,7 +136,7 @@ const RoomPage = ({ from, to }) => {
               <button
                 id="accept-button"
                 className="btn btn-success fs-4"
-                onClick={() => handleCallAccepted({ answer: peer.getLocalDescription() })}
+                onClick={() => handleCallAccepted({ answer: peer.peer.localDescription })}
               >
                 Accept Call
               </button>
