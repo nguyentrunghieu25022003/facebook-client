@@ -37,6 +37,7 @@ const RoomPage = () => {
       });
 
       socket.on("callUser", (data) => {
+        console.log("Call", data);
         setReceivingCall(true);
         setCaller(data.from);
         setName(data.name);
