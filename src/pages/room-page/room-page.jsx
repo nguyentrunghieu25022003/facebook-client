@@ -28,11 +28,6 @@ const RoomPage = () => {
       .getUserMedia({ video: true, audio: true })
       .then((stream) => {
         setStream(stream);
-        console.log("stream", stream);
-        console.log("my video", myVideo.current)
-        if (myVideo.current) {
-          myVideo.current.srcObject = stream;
-        }
       });
 
     if (socket) {
@@ -49,6 +44,12 @@ const RoomPage = () => {
       });
     }
   }, [socket]);
+
+  useEffect(() => {
+    if (stream && myVideo.current) {
+      myVideo.current.srcObject = stream;
+    }
+  }, [stream, myVideo]);
 
   const callUser = (id) => {
     if (!socket || !me) {
