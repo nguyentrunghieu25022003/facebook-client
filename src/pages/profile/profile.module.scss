@@ -6,6 +6,7 @@
 
     .banner {
         position: relative;
+        top: 50px;
 
         span {
             display: block !important;
@@ -121,7 +122,7 @@
     align-items: center;
     justify-content: center;
     position: absolute;
-    padding: 5px;
+    padding: 5px 1px 5px 5px;
     background-color: rgba(255, 255, 255, 0.5); 
     border: none;
     border-radius: 10px;
@@ -147,4 +148,46 @@
     height: 100%;
     opacity: 0;
     cursor: pointer;
+}
+
+#btn-group {
+    position: absolute;
+    top: 50px;
+    left: 40px;
+}
+
+.create-article {
+    border-radius: 12px;
+    margin-top: 10px;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: var(--white-color);
+
+    .img {
+        border-radius: 50%;
+    }
+
+    .img-and-emoji {
+        display: flex;
+        align-items: center;
+        gap: 50px;
+        margin-top: 15px;
+        
+        .img-icon {
+            color: #41B35D;
+            font-size: 3rem;
+        }
+
+        .emoji-icon {
+            color: #ECC25D;
+            font-size: 3rem;
+        }
+    }
+}
+
+.modal {
+    position: fixed;
+    left: 50%;
 }

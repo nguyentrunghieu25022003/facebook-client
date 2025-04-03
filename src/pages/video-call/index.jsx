@@ -5,11 +5,7 @@ const VideoCall = () => {
     <div className="pt-5 pb-5">
       <div className="container">
         <div className="row">
-          <div className="col-xl-12">
-            <div>
-              <RoomPage />
-            </div>
-          </div>
+          <RoomPage />
         </div>
       </div>
     </div>

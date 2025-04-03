@@ -1,10 +1,10 @@
 const Loading = () => {
   return (
-    <div className="w-100">
+    <div className="w-100" style={{ paddingTop: "160px" }}>
       <img
-        src="/imgs/loading__.gif"
+        src="/imgs/1200x1200.gif"
         alt="loading"
-        className="d-block"
+        className="d-block w-25"
         style={{ margin: "0 auto" }}
       />
     </div>

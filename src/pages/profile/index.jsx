@@ -12,9 +12,14 @@ import AddBoxIcon from "@mui/icons-material/AddBox";
 import CakeIcon from "@mui/icons-material/Cake";
 import EmailIcon from "@mui/icons-material/Email";
 import EditIcon from "@mui/icons-material/Edit";
+import ImageIcon from "@mui/icons-material/Image";
+import EmojiEmotionsIcon from "@mui/icons-material/EmojiEmotions";
 import { fetchUserProfile, fetchAllMyPost, fetchAllFriendsList } from "../../api/index";
 import axios from "axios";
+import Modal from "react-modal";
 import PostItem from "../../components/post/index";
+import CreatePost from "../create-post/index";
+import Loading from "../../components/loading/index";
 
 const cx = classNames.bind(styles);
 
@@ -27,6 +32,9 @@ const Profile = () => {
   const [selectedPostId, setSelectedPostId] = useState(null);
   const [coverPhoto, setCoverPhoto] = useState(null);
   const [avatar, setAvatar] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [refreshTrigger, setRefreshTrigger] = useState(false);
   const { userId } = useParams();
   const userJSON = localStorage.getItem("user");
   const user = JSON.parse(userJSON);
@@ -42,6 +50,30 @@ const Profile = () => {
 
   const handleSelectPost = (postId) => {
     setSelectedPostId(postId === selectedPostId ? null : postId);
+  };
+
+  const fetchProfile = async () => {
+    try {
+      const response = await fetchUserProfile(userId);
+      setProfile(response);
+      setIsLoading(false);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const openModal = (event) => {
+    if (event) {
+      event.preventDefault();
+    }
+    setModalIsOpen(true);
+  };
+
+  const closeModal = (event) => {
+    if (event) {
+      event.preventDefault();
+    }
+    setModalIsOpen(false);
   };
 
   const handleSubmitCoverPhoto = async () => {
@@ -60,6 +92,7 @@ const Profile = () => {
       );
       if(response.status === 200) {
         setCoverPhoto(null);
+        await fetchProfile();
       }
     } catch (err) {
       console.error(err);
@@ -83,6 +116,7 @@ const Profile = () => {
       );
       if(response.status === 200) {
         setAvatar(null);
+        await fetchProfile();
       }
     } catch (err) {
       console.error(err);
@@ -90,14 +124,13 @@ const Profile = () => {
   };
 
   useEffect(() => {
-    (async () => {
-      try {
-        const response = await fetchUserProfile(userId);
-        setProfile(response);
-      } catch (err) {
-        console.error(err);
-      }
-    })();
+    setIsLoading(true);
+    fetchProfile();
+    dispatch(fetchAllFriendsList(userId));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch, userId]);
+
+  useEffect(() => {
     (async () => {
       try {
         const response = await fetchAllMyPost(userId);
@@ -106,8 +139,11 @@ const Profile = () => {
         console.error(err);
       }
     })();
-    dispatch(fetchAllFriendsList(userId));
-  }, [dispatch, userId]);
+  }, [refreshTrigger, userId]);
+
+  if(isLoading) {
+    return <Loading />;
+  };
 
   return (
     <div className={cx("profile")}>
@@ -118,7 +154,7 @@ const Profile = () => {
               <div className={cx("banner")}>
                 <LazyLoadImage
                   effect="blur"
-                  src={profile.CoverPhotoURL === "default" ? "/imgs/anh-bia-facebook-phong-canh-thien-nhien-dep-tren-moi-mien.jpg" : profile.CoverPhotoURL}
+                  src={profile.CoverPhotoURL === "default" ? "/imgs/anh-bia-facebook-phong-canh-thien-nhien-dep-tren-moi-mien.jpg" : `${import.meta.env.VITE_IMG_URL}${profile.CoverPhotoURL}`}
                   alt="banner"
                   className={cx("banner-img")} 
                 />
@@ -130,9 +166,9 @@ const Profile = () => {
                       <input type="file" className="cover-photo-file" id={cx("file-input")} onChange={handleCoverPhotoChange} />
                     </button>
                     {coverPhoto && (
-                      <div className="d-flex">
-                        <button className="btn btn-primary" onClick={() => handleSubmitCoverPhoto()}>Save</button>
-                        <button className="btn btn-light" onClick={() => setCoverPhoto(null)}>Cancel</button>
+                      <div className="d-flex align-items-center gap-3" id={cx("btn-group")}>
+                        <button className="btn btn-primary fs-5" onClick={() => handleSubmitCoverPhoto()}>Save</button>
+                        <button className="btn btn-light fs-5" onClick={() => setCoverPhoto(null)}>Cancel</button>
                       </div>
                     )}
                   </>
@@ -163,9 +199,9 @@ const Profile = () => {
                   </div>
                   <div>
                     <h6 className="fs-1 fw-bold">{profile.Username}</h6>
-                    <strong className="d-block fs-3 fw-medium mt-3 text-secondary">
+                    <b className="d-block fs-3 fw-medium mt-3 text-secondary">
                       {friends.length} friends
-                    </strong>
+                    </b>
                   </div>
                 </div>
                 {!isCurrentUser ? (
@@ -251,6 +287,43 @@ const Profile = () => {
             </div>
           </div>
           <div className="col-xl-5">
+            {profile.UserID === user?.UserID && <div className={cx("create-article")}>
+              <div className="d-flex gap-4 w-100" onClick={openModal}>
+                <img
+                  src={user.ProfilePictureURL === "default" ? "/imgs/avatar-trang-4.jpg" : `${import.meta.env.VITE_IMG_URL}${user.ProfilePictureURL}`}
+                  alt="avatar"
+                  className={cx("img")}
+                  style={{ width: "55px" }}
+                />
+                <input
+                  type="text"
+                  placeholder="What are you thinking?"
+                  className="form-control fs-4 fw-bold"
+                />
+              </div>
+              <Modal
+                isOpen={modalIsOpen}
+                onRequestClose={closeModal}
+                className={cx("modal")}
+                contentLabel="Create Post"
+              >
+                <CreatePost
+                  closeModal={closeModal}
+                  setRefreshTrigger={setRefreshTrigger}
+                />
+              </Modal>
+              <div className={cx("border")}></div>
+              <div className={cx("img-and-emoji")}>
+                <span className="d-flex align-items-center gap-2">
+                  <ImageIcon className={cx("img-icon")} />
+                  <b className="fs-4 fw-bold text-secondary">Image/Video</b>
+                </span>
+                <span className="d-flex align-items-center gap-2">
+                  <EmojiEmotionsIcon className={cx("emoji-icon")} />
+                  <b className="fs-4 fw-bold text-secondary">Emotions/Activity</b>
+                </span>
+              </div>
+            </div>}
             <div>
               {posts.map((post, index) => {
                 return (

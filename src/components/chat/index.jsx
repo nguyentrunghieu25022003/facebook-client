@@ -10,17 +10,15 @@ import { useEffect, useRef, useState } from "react";
 import CloseIcon from "@mui/icons-material/Close";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
-import VideocamIcon from "@mui/icons-material/Videocam";
 import AttachFileIcon from "@mui/icons-material/AttachFile";
 import EmojiEmotionsIcon from "@mui/icons-material/EmojiEmotions";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import SendIcon from "@mui/icons-material/Send";
-import { useSocket } from "../../utils/socket";
+import { useSocket } from "../../custom/socket";
 import MediaRecorder from "../../components/media-recorder/index";
 import { formatDate, formatTime, shouldDisplayTime } from "../../utils/date";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchAllMessages, fetchLastMessage } from "../../api/index";
-import { Link } from "react-router-dom";
 import { addMessage, readMessage } from "../../redux/slices/messages";
 import useFetchMessages from "../../utils/getLastMessages.jsx";
 
@@ -28,7 +26,6 @@ const cx = classNames.bind(styles);
 
 const ChatBox = ({ friend, closeChatBox }) => {
   const dispatch = useDispatch();
-  const [friendStatus, setFriendStatus] = useState("");
   const [isMinimized, setIsMinimized] = useState(true);
   const [messageValue, setMessageValue] = useState("");
   const [isAudioActive, setIsAudioActive] = useState(false);
@@ -41,7 +38,7 @@ const ChatBox = ({ friend, closeChatBox }) => {
   const key = [UserID, friend.UserID].sort().join("-");
   const messagesState = useSelector((state) => state.messages.chatBoxer[key]);
   const [messages, setMessages] = useState(messagesState);
-  const socket = useSocket();
+  const { socket } = useSocket();
   const [otherUserIsTyping, setOtherUserIsTyping] = useState(0);
   const typingTimeoutRef = useRef(null);
   const messagesEndRef = useRef(null);
@@ -77,13 +74,6 @@ const ChatBox = ({ friend, closeChatBox }) => {
         setTimeout(() => {
           fetchMessages();
         }, 2000);
-      });
-
-      socket.on("friend:status", ({ userId, userStatus }) => {
-        console.log("Friend status in ChatBox received:", { userId, userStatus });
-        if (friend.UserID === userId) {
-          setFriendStatus(userStatus);
-        }
       });
 
       return () => {
@@ -226,14 +216,15 @@ const ChatBox = ({ friend, closeChatBox }) => {
         <div className={cx("card-header")}>
           <div className="d-flex align-items-center gap-3">
             <img
-              src={friend.ProfilePictureURL === "default" ? "/imgs/avatar-trang-4.jpg" : `${import.meta.env.VITE_IMG_URL}${friend.ProfilePictureURL}`}
+              src={
+                friend.ProfilePictureURL === "default"
+                  ? "/imgs/avatar-trang-4.jpg"
+                  : `${import.meta.env.VITE_IMG_URL}${friend.ProfilePictureURL}`
+              }
               alt="Avatar"
               className={cx("avatar")}
             />
-            <div>
-              <h6 className="fs-4 fw-bold">{friend.Username}</h6>
-              <b className="fs-5 fw-normal text-secondary">{friendStatus}</b>
-            </div>
+            <h6 className="fs-4 fw-bold">{friend.Username}</h6>
             <span onClick={toggleMinimize}>
               {!isMinimized ? (
                 <KeyboardArrowUpIcon className="fs-1 text-primary" />
@@ -242,10 +233,7 @@ const ChatBox = ({ friend, closeChatBox }) => {
               )}
             </span>
           </div>
-          <div className="d-flex align-items-center gap-3">
-            <Link to={`/video-call/friend/${friend.UserID}`}>
-              <VideocamIcon className="fs-1 text-primary" />
-            </Link>
+          <div className="d-flex align-items-center">
             <span onClick={() => closeChatBox(friend.UserID)}>
               <CloseIcon className="fs-1 text-secondary" />
             </span>
@@ -274,7 +262,9 @@ const ChatBox = ({ friend, closeChatBox }) => {
                     <div
                       key={message.MessageID}
                       className="mt-4"
-                      ref={index === messages.length - 1 ? messagesEndRef : null}
+                      ref={
+                        index === messages.length - 1 ? messagesEndRef : null
+                      }
                     >
                       {message.SenderID === UserID ? (
                         <div className="mt-4">
@@ -289,7 +279,9 @@ const ChatBox = ({ friend, closeChatBox }) => {
                               <div className={cx("multimedia")}>
                                 {message.ImageURL && (
                                   <img
-                                    src={`${import.meta.env.VITE_IMG_URL}${message.ImageURL}`}
+                                    src={`${import.meta.env.VITE_IMG_URL}${
+                                      message.ImageURL
+                                    }`}
                                     alt="img"
                                     style={{
                                       maxWidth: "100%",
@@ -299,7 +291,9 @@ const ChatBox = ({ friend, closeChatBox }) => {
                                 )}
                                 {message.AudioURL && (
                                   <audio
-                                    src={`${import.meta.env.VITE_IMG_URL}${message.AudioURL}`}
+                                    src={`${import.meta.env.VITE_IMG_URL}${
+                                      message.AudioURL
+                                    }`}
                                     controls
                                   />
                                 )}
@@ -317,13 +311,29 @@ const ChatBox = ({ friend, closeChatBox }) => {
                                     placement="bottom-end"
                                     trigger="click"
                                     arrow={false}
-                                    content={<div><b className="fs-5 fw-medium text-dark">Remove this message</b></div>}
+                                    content={
+                                      <div>
+                                        <b className="fs-5 fw-medium text-dark">
+                                          Remove this message
+                                        </b>
+                                      </div>
+                                    }
                                     className={cx("custom-message-container")}
                                   >
-                                    <MoreHorizIcon className={cx("more-icon", "fs-1", "text-secondary")} />
+                                    <MoreHorizIcon
+                                      className={cx(
+                                        "more-icon",
+                                        "fs-1",
+                                        "text-secondary"
+                                      )}
+                                    />
                                   </Tippy>
                                 </div>
-                                { index === messages.length - 1 && <b className="fs-5 text-dark mt-2 text-center">{message.IsRead ? "Read" : "Unread"}</b> }
+                                {index === messages.length - 1 && (
+                                  <b className="fs-5 text-dark mt-2 text-center">
+                                    {message.IsRead ? "Read" : "Unread"}
+                                  </b>
+                                )}
                               </div>
                             )}
                           </div>
@@ -335,7 +345,13 @@ const ChatBox = ({ friend, closeChatBox }) => {
                           </p>
                           <div className="d-flex align-items-center gap-3">
                             <img
-                              src={friend.ProfilePictureURL === "default" ? "/imgs/avatar-trang-4.jpg" : `${import.meta.env.VITE_IMG_URL}${friend.ProfilePictureURL}`}
+                              src={
+                                friend.ProfilePictureURL === "default"
+                                  ? "/imgs/avatar-trang-4.jpg"
+                                  : `${import.meta.env.VITE_IMG_URL}${
+                                      friend.ProfilePictureURL
+                                    }`
+                              }
                               alt="avatar"
                               className={cx("avatar")}
                             />
@@ -343,7 +359,9 @@ const ChatBox = ({ friend, closeChatBox }) => {
                               <div className={cx("multimedia")}>
                                 {message.ImageURL && (
                                   <img
-                                    src={`${import.meta.env.VITE_IMG_URL}${message.ImageURL}`}
+                                    src={`${import.meta.env.VITE_IMG_URL}${
+                                      message.ImageURL
+                                    }`}
                                     alt="img"
                                     style={{
                                       maxWidth: "100%",
@@ -353,7 +371,9 @@ const ChatBox = ({ friend, closeChatBox }) => {
                                 )}
                                 {message.AudioURL && (
                                   <audio
-                                    src={`${import.meta.env.VITE_IMG_URL}${message.AudioURL}`}
+                                    src={`${import.meta.env.VITE_IMG_URL}${
+                                      message.AudioURL
+                                    }`}
                                     controls
                                   />
                                 )}
@@ -375,7 +395,13 @@ const ChatBox = ({ friend, closeChatBox }) => {
               {otherUserIsTyping === UserID && (
                 <div className="d-flex align-items-center gap-3 mt-4">
                   <img
-                    src={friend.ProfilePictureURL === "default" ? "/imgs/avatar-trang-4.jpg" : `${import.meta.env.VITE_IMG_URL}${friend.ProfilePictureURL}`}
+                    src={
+                      friend.ProfilePictureURL === "default"
+                        ? "/imgs/avatar-trang-4.jpg"
+                        : `${import.meta.env.VITE_IMG_URL}${
+                            friend.ProfilePictureURL
+                          }`
+                    }
                     alt="avatar"
                     className={cx("avatar")}
                   />

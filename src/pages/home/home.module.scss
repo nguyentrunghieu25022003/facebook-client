@@ -129,9 +129,9 @@
     }
 
     .modal {
+        z-index: 999;
         position: fixed;
-        top: 50%;
-        left: 200px;
+        left: 50%;
     }
 
     .img {
@@ -153,6 +153,7 @@
         .mkt-img {
             max-width: 120px;
             border-radius: 4px;
+            margin-left: 10px;
         }
     }
 
@@ -174,12 +175,13 @@
 }
 
 .create-article {
+    width: calc(100% - 15px);
     border-radius: 12px;
-    margin-top: 10px;
     padding: 15px;
     display: flex;
     flex-direction: column;
     align-items: center;
+    margin: 10px auto 0 auto;
     background-color: var(--white-color);
 
     .img-and-emoji {
@@ -207,4 +209,55 @@
     display: flex;
     justify-content: space-between;
     gap: 15px;
+}
+
+.stories {
+    display: flex;
+    overflow: hidden;
+    position: relative;
+
+    .story-container {
+        display: flex;
+        transition: transform 0.5s ease-in-out;
+        gap: 10px;
+    }
+
+    img {
+        width: 100%;
+        border-top-left-radius: 8px;
+        border-top-right-radius: 8px;
+    }
+
+    .wrapper-item {
+        height: 100%;
+        border-radius: 8px;
+        padding: 10px 0 0 10px;
+        background-color: var(--white-color);
+    }
+
+    #left-btn, #right-btn {
+        position: absolute;
+        z-index: 1;
+    }
+
+    #left-btn {
+        top: 45%;
+        left: 10px;
+        color: var(--text-color);
+    }
+
+    #right-btn {
+        top: 45%;
+        right: 10px;
+        color: var(--text-color);
+    }
+
+    .col-xl-3 {
+        flex: 0 !important;
+    }
+}
+
+#desc {
+    padding: 10px 20px;
+    line-height: 1.4;
 }

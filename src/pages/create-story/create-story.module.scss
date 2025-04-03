@@ -1,0 +1,13 @@
+.create-story {
+    padding: 30px 20px 80px 20px;
+    min-height: 700px;
+    background-color: var(--white-color);
+}
+
+.custom {
+    min-width: calc(100% + 20px);
+    background: var(--white-color);
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    padding: 5px 0;
+  }

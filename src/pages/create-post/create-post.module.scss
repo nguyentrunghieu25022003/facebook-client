@@ -1,19 +1,5 @@
 .create-post {
     margin: 0 auto;
-    
-    .create-box {
-        position: absolute;
-        top: 100px;
-        left: calc(100%/2 - 200px);
-        background-color: var(--white-color);
-        width: 500px;
-        min-height: 400px;
-        padding: 20px 20px 50px 20px;
-        background-color: var(--white-color);
-        border-radius: 4px;
-        -webkit-box-shadow: 0px -1px 15px -2px rgba(0,0,0,0.81); 
-        box-shadow: 0px -1px 15px -2px rgba(0,0,0,0.81);
-    }
 
     .user {
         display: flex;
@@ -27,6 +13,21 @@
             border-radius: 50%;
         }
     }
+}
+
+.create-box {
+    position: absolute;
+    z-index: 999;
+    top: 100px;
+    left: calc(100%/2 - 200px);
+    background-color: var(--white-color);
+    width: 500px;
+    min-height: 400px;
+    padding: 20px 20px 50px 20px;
+    background-color: var(--white-color);
+    border-radius: 4px;
+    -webkit-box-shadow: 0px -1px 15px -2px rgba(0,0,0,0.81); 
+    box-shadow: 0px -1px 15px -2px rgba(0,0,0,0.81);
 }
 
 .custom {

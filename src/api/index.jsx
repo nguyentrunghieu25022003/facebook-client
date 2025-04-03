@@ -71,6 +71,20 @@ export const fetchAllFriendListSuggested = async (userId) => {
   }
 };
 
+export const fetchAllFriendListUnfriend = async (userId) => {
+  try {
+    const response = await axios.get(
+      `${import.meta.env.VITE_API_URL}/page/unfriend/all/${userId}`
+    );
+    if (response.status === 200) {
+      return response.data;
+    }
+    return null;
+  } catch (err) {
+    console.error(err);
+  }
+};
+
 export const fetchLastMessage = async (userId) => {
   try {
     const response = await axios.get(
@@ -101,6 +115,20 @@ export const fetchPostDetail = async (postId) => {
   }
 };
 
+export const fetchAllStories = async (userId) => {
+  try {
+    const response = await axios.get(
+      `${import.meta.env.VITE_API_URL}/page/posts/${userId}`
+    );
+    if (response.status === 200) {
+      return response.data.stories;
+    }
+    return null;
+  } catch (err) {
+    console.error(err);
+  }
+};
+
 export const fetchAllPosts = createAsyncThunk(
   "posts/fetchPosts",
   async (userId, { rejectedWithValue }) => {
@@ -109,7 +137,7 @@ export const fetchAllPosts = createAsyncThunk(
         `${import.meta.env.VITE_API_URL}/page/posts/${userId}`
       );
       if (response.status === 200) {
-        return response.data;
+        return response.data.posts;
       }
     } catch (err) {
       rejectedWithValue(err);

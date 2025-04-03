@@ -1,11 +1,11 @@
 import { Fragment } from "react";
 import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom";
 import { publicRoutes, privateRoutes } from "./routes/index";
-import useAuthToken from "./utils/auth";
+import useAuthToken from "./custom/auth";
 import Loading from "./components/loading/index";
 import HandleReloading from "./utils/navigation";
 
-function App() {
+const App = () => {
   const { userToken, isLoading } = useAuthToken();
 
   if(isLoading) {

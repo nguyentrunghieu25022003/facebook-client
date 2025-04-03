@@ -5,6 +5,7 @@ import styles from "./video.module.scss";
 import { fetchAllMyVideoPost, fetchAllFriendsList } from "../../api/index";
 import PostItem from "../../components/post/index";
 import ChatBox from "../../components/chat/index";
+import Loading from "../../components/loading/index";
 
 const cx = classNames.bind(styles);
 
@@ -13,6 +14,7 @@ const Video = () => {
   const [refreshTrigger, setRefreshTrigger] = useState(false);
   const [selectedFriends, setSelectedFriends] = useState([]);
   const [posts, setPosts] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
   const dispatch = useDispatch();
   const friendsState = useSelector((state) => state.friends);
   const allFriends = friendsState.items?.ReceivedFriends?.concat(friendsState.items?.RequestedFriends) || [];
@@ -38,12 +40,21 @@ const Video = () => {
 
   useEffect(() => {
     (async () => {
-      const response = await fetchAllMyVideoPost();
-      setPosts(response);
+      setIsLoading(true);
+      try {
+        const response = await fetchAllMyVideoPost();
+        setPosts(response);
+        setIsLoading(false);
+      } catch (err) {
+        console.log("Error: ", err);
+      }
     })();
     dispatch(fetchAllFriendsList(user.UserID));
   }, [refreshTrigger, dispatch, user.UserID]);
 
+  if(isLoading) {
+    return <Loading />;
+  };
 
   return (
     <div className={cx("home")}>

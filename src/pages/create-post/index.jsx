@@ -10,7 +10,7 @@ import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
 import { useState } from "react";
 import axios from "axios";
-import { useDispatch } from 'react-redux';
+import { useDispatch } from "react-redux";
 import { addPost } from "../../redux/slices/posts";
 
 const cx = classNames.bind(styles);
@@ -41,7 +41,7 @@ const CreatePost = ({ closeModal, setRefreshTrigger }) => {
       if (fileType === "image" || fileType === "video") {
         reader.readAsDataURL(file);
       }
-      
+
       setFileName(file.name);
     } else {
       setFile(null);
@@ -65,7 +65,9 @@ const CreatePost = ({ closeModal, setRefreshTrigger }) => {
       formData.append("FileURL", file);
     }
     try {
-      const response = await axios.post(`${import.meta.env.VITE_API_URL}/page/post/create`, formData,
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL}/page/post/create`,
+        formData,
         {
           headers: {
             "Content-Type": "multipart/form-data",
@@ -76,7 +78,7 @@ const CreatePost = ({ closeModal, setRefreshTrigger }) => {
 
       if (response.status === 200) {
         dispatch(addPost(response.data.post));
-        setRefreshTrigger(prev => !prev);
+        setRefreshTrigger((prev) => !prev);
         closeModal();
         setPostContent("");
         setFile(null);
@@ -95,71 +97,81 @@ const CreatePost = ({ closeModal, setRefreshTrigger }) => {
     <div className={cx("create-post")}>
       <div className="container">
         <div className="row">
-          <div className="col-xl-12">
-            <div className={cx("create-box")}>
-              <span
-                className="d-flex justify-content-end mb-2"
-                onClick={closeModal}
-              >
-                <CloseIcon className="fs-1" />
-              </span>
-              <h4 className="text-center fs-1 fw-bold pb-5">Create post</h4>
-              <div className={cx("border")}></div>
-              <form onSubmit={handleCreatePost}>
-                <div className={cx("user")}>
-                  <img
-                    src={user.ProfilePictureURL === "default" ? "/imgs/avatar-trang-4.jpg" : `${import.meta.env.VITE_IMG_URL}${user.ProfilePictureURL}`}
-                    alt="avatar"
-                    className={cx("avatar")}
-                  />
-                  <h6 className="fs-4 fw-bold">{user.Username}</h6>
-                </div>
-                <textarea
-                  className="form-control fs-2 fw-normal"
-                  placeholder="What are you thinking?"
-                  rows={5}
-                  cols={45}
-                  value={postContent}
-                  onChange={(e) => setPostContent(e.target.value)}
+          <div className={cx("create-box")}>
+            <span
+              className="d-flex justify-content-end mb-2"
+              onClick={closeModal}
+            >
+              <CloseIcon className="fs-1" />
+            </span>
+            <h4 className="text-center fs-1 fw-bold pb-5">Create post</h4>
+            <div className={cx("border")}></div>
+            <form onSubmit={handleCreatePost}>
+              <div className={cx("user")}>
+                <img
+                  src={
+                    user.ProfilePictureURL === "default"
+                      ? "/imgs/avatar-trang-4.jpg"
+                      : `${import.meta.env.VITE_IMG_URL}${
+                          user.ProfilePictureURL
+                        }`
+                  }
+                  alt="avatar"
+                  className={cx("avatar")}
                 />
-                <div className="d-flex align-items-center justify-content-between pt-4 pb-2">
-                  <div className="d-flex align-items-center gap-2">
-                    <b className="fs-4 fw-medium">Add to your article</b>
-                    <div>
-                      <input
-                        type="file"
-                        id="file-upload"
-                        style={{ display: "none" }}
-                        onChange={handleFileChange}
-                        accept="image/*,video/*"
-                      />
-                      <label htmlFor="file-upload" style={{ cursor: "pointer" }}>
-                        <AttachFileIcon className="fs-2" />
-                      </label>
-                    </div>
-                  </div>
+                <h6 className="fs-4 fw-bold">{user.Username}</h6>
+              </div>
+              <textarea
+                className="form-control fs-2 fw-normal"
+                placeholder="What are you thinking?"
+                rows={5}
+                cols={45}
+                value={postContent}
+                onChange={(e) => setPostContent(e.target.value)}
+              />
+              <div className="d-flex align-items-center justify-content-between pt-4 pb-2">
+                <div className="d-flex align-items-center gap-2">
+                  <b className="fs-4 fw-medium">Add to your article</b>
                   <div>
-                    <Tippy
-                      interactive={true}
-                      arrow={false}
-                      trigger="click"
-                      content={<Picker data={data} onEmojiSelect={(emoji) => addEmoji(emoji, postContent)} theme="light" />}
-                      className={cx("custom")}
-                      placement="right"
-                    >
-                      <EmojiEmotionsIcon className="fs-2" />
-                    </Tippy>
+                    <input
+                      type="file"
+                      id="file-upload"
+                      style={{ display: "none" }}
+                      onChange={handleFileChange}
+                      accept="image/*,video/*"
+                    />
+                    <label htmlFor="file-upload" style={{ cursor: "pointer" }}>
+                      <AttachFileIcon className="fs-2" />
+                    </label>
                   </div>
                 </div>
-                {fileName && <div className="fs-4">{fileName}</div>}
-                <button
-                  type="submit"
-                  className="btn btn-primary w-100 fs-3 fw-bold mt-5"
-                >
-                  Post
-                </button>
-              </form>
-            </div>
+                <div>
+                  <Tippy
+                    interactive={true}
+                    arrow={false}
+                    trigger="click"
+                    content={
+                      <Picker
+                        data={data}
+                        onEmojiSelect={(emoji) => addEmoji(emoji, postContent)}
+                        theme="light"
+                      />
+                    }
+                    className={cx("custom")}
+                    placement="right"
+                  >
+                    <EmojiEmotionsIcon className="fs-2" />
+                  </Tippy>
+                </div>
+              </div>
+              {fileName && <div className="fs-4">{fileName}</div>}
+              <button
+                type="submit"
+                className="btn btn-primary w-100 fs-3 fw-bold mt-5"
+              >
+                Post
+              </button>
+            </form>
           </div>
         </div>
       </div>

@@ -8,7 +8,6 @@ import {
   HomeIcon,
   PeopleOutlineIcon,
   OndemandVideoIcon,
-  StorefrontIcon,
   GroupsIcon,
   AppsRoundedIcon,
   ChatBubbleIcon,
@@ -20,6 +19,7 @@ import {
   MoreHorizIcon,
   FullscreenExitIcon,
   EditNoteIcon,
+  VideocamIcon
 } from "../../icons/header.jsx";
 import { Link, Navigate } from "react-router-dom";
 import Tippy from "@tippyjs/react";
@@ -29,7 +29,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { fetchAllNotification, fetchAllFriendsList, fetchLastMessage } from "../../api/index";
 import ChatBubble from "../chat-bubble/index";
 import ChatBox from "../chat/index.jsx";
-import { useSocket } from "../../utils/socket";
+import { useSocket } from "../../custom/socket";
 import { formatDate } from "../../utils/date";
 import useFetchMessages from "../../utils/getLastMessages.jsx";
 
@@ -46,7 +46,13 @@ const Header = () => {
   const [countNotifications, setCountNotifications] = useState(0);
   const friendsState = useSelector((state) => state.friends);
   const allFriends = friendsState.items?.ReceivedFriends?.concat(friendsState.items?.RequestedFriends) || [];
-  const socket = useSocket();
+  const { socket } = useSocket();
+  const [showTippy, setShowTippy] = useState(false);
+
+  const handleSetActive = (tabName) => {
+    setIsActive(tabName);
+    localStorage.setItem("isActive", JSON.stringify(tabName));
+  };  
 
   const handleSearch = debounce(async (userName) => {
     try {
@@ -232,7 +238,7 @@ const Header = () => {
                 <div className={cx("navigation-item")}>
                   <Link
                     to="/"
-                    onClick={() => setIsActive("home")}
+                    onClick={() => handleSetActive("home")}
                     className={isActive === "home" ? cx("active") : ""}
                   >
                     <HomeIcon className={cx("icon")} />
@@ -241,7 +247,7 @@ const Header = () => {
                 <div className={cx("navigation-item")}>
                   <Link
                     to="/friends"
-                    onClick={() => setIsActive("friends")}
+                    onClick={() => handleSetActive("friends")}
                     className={isActive === "friends" ? cx("active") : ""}
                   >
                     <PeopleOutlineIcon className={cx("icon")} />
@@ -250,7 +256,7 @@ const Header = () => {
                 <div className={cx("navigation-item")}>
                   <Link
                     to="/watch"
-                    onClick={() => setIsActive("watch")}
+                    onClick={() => handleSetActive("watch")}
                     className={isActive === "watch" ? cx("active") : ""}
                   >
                     <OndemandVideoIcon className={cx("icon")} />
@@ -258,17 +264,17 @@ const Header = () => {
                 </div>
                 <div className={cx("navigation-item")}>
                   <Link
-                    to="/market"
-                    onClick={() => setIsActive("market")}
-                    className={isActive === "market" ? cx("active") : ""}
+                    to="/video-call"
+                    onClick={() => handleSetActive("video-call")}
+                    className={isActive === "video-call" ? cx("active") : ""}
                   >
-                    <StorefrontIcon className={cx("icon")} />
+                    <VideocamIcon className={cx("icon")} />
                   </Link>
                 </div>
                 <div className={cx("navigation-item")}>
                   <Link
-                    to="/group"
-                    onClick={() => setIsActive("group")}
+                    to="/groups"
+                    onClick={() => handleSetActive("group")}
                     className={isActive === "group" ? "active" : ""}
                   >
                     <GroupsIcon className={cx("icon")} />
@@ -294,7 +300,8 @@ const Header = () => {
                   interactive={true}
                   placement="bottom"
                   arrow={false}
-                  trigger="click"
+                  visible={showTippy}
+                  onClickOutside={() => setShowTippy(false)}
                   content={
                     <div>
                       <div className={cx("message-header")}>
@@ -318,7 +325,10 @@ const Header = () => {
                           <div
                             key={index}
                             className="d-flex align-items-center gap-3 pt-3 pb-3"
-                            onClick={() => openChatBox(friend)}
+                            onClick={() => {
+                              openChatBox(friend);
+                              setShowTippy(false);
+                            }}
                           >
                             <img
                               src={
@@ -349,7 +359,7 @@ const Header = () => {
                   className={cx("custom-chat")}
                   maxWidth={500}
                 >
-                  <div className={cx("circle")} id={cx("chat")}>
+                  <div className={cx("circle")} id={cx("chat")} onClick={() => setShowTippy(!showTippy)}>
                     {countMessages > 0 && (
                       <div className={cx("circle-number")}>{countMessages}</div>
                     )}

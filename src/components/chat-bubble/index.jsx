@@ -5,7 +5,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { fetchAllMessages } from "../../api/index";
 import { useEffect, useCallback } from "react";
 import { formatTime } from "../../utils/date";
-import { useSocket } from "../../utils/socket";
+import { useSocket } from "../../custom/socket";
 
 const cx = classNames.bind(styles);
 
@@ -14,7 +14,7 @@ const ChatBubble = ({ friend }) => {
   const UserID = JSON.parse(localStorage.getItem("user"))?.UserID;
   const key = [UserID, friend.UserID].sort().join("-");
   const messages = useSelector((state) => state.messages.chatBoxer[key] || []);
-  const socket = useSocket();
+  const { socket } = useSocket();
 
   const fetchMessages = useCallback(() => {
     dispatch(fetchAllMessages({ senderId: UserID, receiverId: friend.UserID }));

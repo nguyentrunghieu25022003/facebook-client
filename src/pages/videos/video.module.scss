@@ -53,3 +53,12 @@
         }
     }
 }
+
+.chat-list {
+    position: fixed;
+    right: 100px;
+    bottom: 0;
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+}

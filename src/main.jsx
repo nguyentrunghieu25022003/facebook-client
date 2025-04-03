@@ -7,7 +7,7 @@ import App from "./App.jsx";
 import GlobalStyles from "./components/GlobalStyles/index";
 import Modal from "react-modal";
 import store from "./redux/store";
-import { SocketProvider } from "./utils/socket.jsx";
+import { SocketProvider } from "./custom/socket";
 
 Modal.setAppElement("#root");
 createRoot(document.getElementById("root")).render(

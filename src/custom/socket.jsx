@@ -1,7 +1,7 @@
 import PropTypes from "prop-types";
 import { createContext, useContext, useEffect, useState } from "react";
 import io from "socket.io-client";
-import useFetchMessages from "./getLastMessages";
+import useFetchMessages from "../utils/getLastMessages";
 import { fetchLastMessage } from "../api/index";
 
 const SocketContext = createContext();
@@ -25,7 +25,6 @@ export const SocketProvider = ({ children }) => {
 
       socketInstance.on("connect", () => {
         socketInstance.emit("joinRoom", { callerUserId });
-        socketInstance.emit("user:action", { userId: callerUserId, userStatus: "Online" });
         socketInstance.on("me", (id) => sessionStorage.setItem("id", id));
       });
 
@@ -36,7 +35,7 @@ export const SocketProvider = ({ children }) => {
       setSocket(socketInstance);
 
       return () => {
-        socketInstance.emit("user:action", { userId: callerUserId, userStatus: "Offline" });
+        socketInstance.off("me");
         socketInstance.disconnect();
       };
     }
@@ -47,7 +46,7 @@ export const SocketProvider = ({ children }) => {
   }
 
   return (
-    <SocketContext.Provider value={socket}>{children}</SocketContext.Provider>
+    <SocketContext.Provider value={{socket: socket}}>{children}</SocketContext.Provider>
   );
 };
 

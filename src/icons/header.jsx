@@ -15,6 +15,7 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import FullscreenExitIcon from "@mui/icons-material/FullscreenExit";
 import EditNoteIcon from "@mui/icons-material/EditNote";
+import VideocamIcon from "@mui/icons-material/Videocam";
 
 export {
   FacebookOutlinedIcon,
@@ -34,4 +35,5 @@ export {
   MoreHorizIcon,
   FullscreenExitIcon,
   EditNoteIcon,
+  VideocamIcon
 };

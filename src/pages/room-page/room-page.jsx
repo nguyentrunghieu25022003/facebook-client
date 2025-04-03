@@ -1,14 +1,16 @@
+import { useEffect, useRef, useState } from "react";
+import { CopyToClipboard } from "react-copy-to-clipboard";
 import Button from "@mui/material/Button";
-import IconButton from "@mui/material/IconButton";
 import TextField from "@mui/material/TextField";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import PhoneIcon from "@mui/icons-material/Phone";
-import { useEffect, useRef, useState } from "react";
-import { CopyToClipboard } from "react-copy-to-clipboard";
-import { useSocket } from "../../utils/socket";
+import PersonIcon from "@mui/icons-material/Person";
+import { useSocket } from "../../custom/socket";
+import Loading from "../../components/loading/index";
 
 const RoomPage = () => {
-  const socket = useSocket();
+  const { socket } = useSocket();
+  const Username = JSON.parse(localStorage.getItem("user")).Username || "";
   const me = sessionStorage.getItem("id") || "";
   const [stream, setStream] = useState();
   const [receivingCall, setReceivingCall] = useState(false);
@@ -17,21 +19,24 @@ const RoomPage = () => {
   const [callAccepted, setCallAccepted] = useState(false);
   const [idToCall, setIdToCall] = useState("");
   const [callEnded, setCallEnded] = useState(false);
-  const [name, setName] = useState("");
+  const [name, setName] = useState(Username);
+  const [isLoading, setIsLoading] = useState(false);
   const myVideo = useRef();
   const userVideo = useRef();
   const connectionRef = useRef();
 
   useEffect(() => {
+    setIsLoading(true);
+    
     navigator.mediaDevices
       .getUserMedia({ video: true, audio: true })
       .then((stream) => {
         setStream(stream);
+        setIsLoading(false);
       });
 
     if (socket) {
       socket.on("callUser", (data) => {
-        console.log("Call", data);
         setReceivingCall(true);
         setCaller(data.from);
         setName(data.name);
@@ -76,6 +81,10 @@ const RoomPage = () => {
   };
 
   const answerCall = () => {
+    if (!socket || !stream) {
+      console.error("Socket or MediaStream not initialized");
+      return;
+    }
     setCallAccepted(true);
     const peer = new window.SimplePeer({
       initiator: false,
@@ -98,91 +107,130 @@ const RoomPage = () => {
     connectionRef.current.destroy();
   };
 
+  if(isLoading) {
+    return <Loading />;
+  };
+
   return (
-    <>
-      <h3 className="fs-2 text-center">Zoomish</h3>
-      <div className="container">
-        <div className="video-container">
-          <div className="video d-flex justify-content-center">
+    <div className="container py-5 bg-white">
+      <h3 className="text-center text-dark mb-5 fs-1 fw-medium">Zoomish</h3>
+      <div className="row justify-content-center">
+        <div className="col-md-5 col-lg-4 mb-4">
+          <h5 className="text-center fs-4 fw-medium mb-2">You</h5>
+          <div className="card p-3">
             {stream && (
               <video
                 playsInline
                 muted
                 ref={myVideo}
                 autoPlay
-                style={{ width: "300px" }}
+                className="w-100 border rounded"
               />
             )}
           </div>
-          <div className="video">
+        </div>
+        <div className="col-md-5 col-lg-4 mb-4">
+          <h5 className="text-center fs-4 fw-medium mb-2">User Video</h5>
+          <div className="card p-3">
             {callAccepted && !callEnded ? (
               <video
                 playsInline
                 ref={userVideo}
                 autoPlay
-                style={{ width: "300px" }}
+                className="w-100 border rounded"
               />
-            ) : null}
-          </div>
-        </div>
-        <div className="myId mt-5">
-          <div className="d-flex align-items-center justify-content-center gap-2">
-            <TextField
-              id="filled-basic"
-              label="Name"
-              variant="filled"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
-            <TextField
-              id="filled-basic"
-              label="ID to call"
-              variant="filled"
-              value={idToCall}
-              onChange={(e) => setIdToCall(e.target.value)}
-            />
-          </div>
-          <div className="d-flex align-items-center justify-content-center mt-3">
-            <input className="form-control fs-4" value={me} disabled />
-            <CopyToClipboard text={me}>
-              <Button
-                variant="contained"
-                color="primary"
-                startIcon={<AssignmentIcon fontSize="large" />}
-              >
-                Copy ID
-              </Button>
-            </CopyToClipboard>
-          </div>
-          <div className="call-button">
-            {callAccepted && !callEnded ? (
-              <Button variant="contained" color="secondary" onClick={leaveCall}>
-                End Call
-              </Button>
             ) : (
-              <IconButton
-                color="primary"
-                aria-label="call"
-                onClick={() => callUser(idToCall)}
-              >
-                <PhoneIcon fontSize="large" />
-              </IconButton>
+              <span className="text-center">
+                <PersonIcon style={{ fontSize: "19rem"}} />
+              </span>
             )}
-            {idToCall}
           </div>
         </div>
-        <div>
-          {receivingCall && !callAccepted ? (
-            <div className="caller">
-              <h3>{name} is calling...</h3>
+      </div>
+      <div className="row justify-content-center mt-3">
+        <div className="col-md-6 text-center">
+          <TextField
+            id="filled-basic"
+            label="Name"
+            variant="filled"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="mb-3 w-100"
+            InputLabelProps={{
+              style: { fontSize: "1.6rem" },
+            }}
+            InputProps={{
+              style: { fontSize: "1.8rem" },
+            }}
+          />
+          <TextField
+            id="filled-basic"
+            label="ID to call"
+            variant="filled"
+            value={idToCall}
+            onChange={(e) => setIdToCall(e.target.value)}
+            className="mb-3 w-100"
+            InputLabelProps={{
+              style: { fontSize: "1.6rem" },
+            }}
+            InputProps={{
+              style: { fontSize: "1.8rem" },
+            }}
+          />
+        </div>
+      </div>
+      <div className="row justify-content-center mt-3">
+        <div className="col-md-6 text-center">
+          <input
+            type="text"
+            className="form-control fs-4 mb-3 text-center"
+            value={me}
+            disabled
+          />
+          <CopyToClipboard text={me}>
+            <Button
+              variant="contained"
+              color="primary"
+              startIcon={<AssignmentIcon fontSize="large" />}
+              className="mb-3 fs-5"
+            >
+              Copy ID
+            </Button>
+          </CopyToClipboard>
+        </div>
+      </div>
+      <div className="row justify-content-center mt-3">
+        <div className="col-md-6 text-center">
+          {callAccepted && !callEnded ? (
+            <Button variant="contained" color="secondary" onClick={leaveCall}>
+              End Call
+            </Button>
+          ) : (
+            <Button
+              variant="contained"
+              color="success"
+              startIcon={<PhoneIcon fontSize="large" />}
+              onClick={() => callUser(idToCall)}
+              className="mb-3 fs-5"
+            >
+              Call
+            </Button>
+          )}
+        </div>
+      </div>
+      <div className="row justify-content-center mt-3">
+        <div className="col-md-6 text-center">
+          {receivingCall && !callAccepted && (
+            <div className="alert alert-info">
+              <h5>{name} is calling...</h5>
               <Button variant="contained" color="primary" onClick={answerCall}>
                 Answer
               </Button>
             </div>
-          ) : null}
+          )}
         </div>
       </div>
-    </>
+    </div>
   );
 };
 
